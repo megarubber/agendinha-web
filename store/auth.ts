@@ -5,13 +5,17 @@ import type Notification from "~/interfaces/notification";
 import type GoogleTokens from "~/interfaces/googleTokens";
 import getUserInfo from "~/utils/api/user/getUserInfo";
 import loginWithOAuth2 from "~/utils/google/loginWithOAuth2";
-import { useLoaderStore } from "./loader";
 
 type Callback = (status: number, confirmRegister: boolean) => void;
 
 export const useAuthStore = defineStore("auth", {
   state: () => ({
-    user: {} as User,
+    user: {
+      id_usuario: -1,
+      nome: 'teste',
+      foto_perfil: '',
+      cadastro_confirmado: false,
+    } as User,
     authenticated: false,
     notifications: [] as Notification[],
     notReadNotifications: 0, 
@@ -20,10 +24,7 @@ export const useAuthStore = defineStore("auth", {
   }),
   actions: {
     async refreshAuth() {
-      const loader = useLoaderStore();
       try {
-        loader.startLoading();
-
         const info: any = await getUserInfo();
         if(info.status != 200) return { status: info.status };
 
@@ -31,7 +32,7 @@ export const useAuthStore = defineStore("auth", {
         if(!data.usuario.cadastro_confirmado) return { status: 403 };
 
         this.notifications = data.notificacoes;
-        this.user = data.usuario;
+        Object.assign(this.user, data.usuario);
 
         this.authenticated = true;
 
@@ -42,10 +43,8 @@ export const useAuthStore = defineStore("auth", {
         this.notReadNotifications = notReadNotifications.length;
       } catch(error: any) {
         console.error(error.status);
-        loader.endLoading();
         return { status: error.status };
       }
-      loader.endLoading();
       return { status: 200 };
     },
     async authenticateUser(user_auth: UserAuth) {
