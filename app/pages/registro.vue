@@ -40,22 +40,14 @@
         />
       </section>
       <v-btn class="w-100" @click="register()">Criar conta</v-btn>
-      <div class="text-center mt-3">
-        <p class="text-center">ou</p>
-        <v-btn color="black" width="250" class="align-self-center mt-3" variant="outlined" @click="loginWithGoogle">
-          <Icon class="mr-4" name="icons:google-logo" size="30" />
-          Entrar com o Google
-        </v-btn>
-      </div>
     </v-main>
   </v-container>
 </template>
 
 <script lang="ts">
-import { useLoaderStore } from "~/app/store/loader";
-import createUser from "~/server/api/register/createUser";
-import type UserRegister from "~/interfaces/userRegister";
-import { useAuthStore } from "~/app/store/auth";
+import { useLoaderStore } from "~/stores/loader";
+import type UserRegister from "~~/shared/types/userRegister";
+import { useAuthStore } from "~/stores/auth";
 
 export default defineComponent({
   name: "Registro",
@@ -73,24 +65,6 @@ export default defineComponent({
     };
   },
   methods: {
-    loginWithGoogle() {
-      this.loader.startLoading();
-      this.auth.authenticateUserGoogle(
-        async (status: number, confirmUser: boolean) => {
-          if(status != 200) {
-            this.toast.error("Erro ao fazer login.");
-            this.loader.endLoading();
-            return;
-          }
-          
-          const permission = await Notification.requestPermission();
-          if(permission == 'granted') await usePush(this.auth.user.id_usuario);
-
-          this.$router.push(confirmUser ? "/" : "/completar-informacoes");
-          this.loader.endLoading();
-        }
-      );
-    },
     async register() {
       this.loader.startLoading();
 
@@ -114,7 +88,13 @@ export default defineComponent({
         return;
       }
 
-      const response = await createUser(this.user);
+      const response: any = await useApi(
+        "/usuarios/registrar",
+        {
+          method: "POST",
+          body: this.user
+        }
+      );
       if(response.status == 200) this.$router.push("/login");
       else this.toast.error("Erro ao fazer o cadastro.");
 

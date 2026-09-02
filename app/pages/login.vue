@@ -54,7 +54,7 @@
 <script lang="ts">
 import { useAuthStore } from "~/stores/auth";
 import { useLoaderStore } from "~/stores/loader";
-import { validateEmail } from '~/server/utils/validate';
+import { validateEmail } from '~/utils/validate';
 
 export default defineComponent({
   name: "Login",

@@ -16,10 +16,13 @@
                 </v-avatar>
             </template>
             <v-divider :thickness="3"/>
-            <v-card-title class="font-weight-bold">
-                {{ props.titulo }}
+            <v-card-title class="font-weight-bold text-wrap">
+                {{ props.nome_paciente || 'Paciente' }}
             </v-card-title>
-            <v-card-text>
+            <v-card-subtitle class="text-h6 pb-2">
+                {{ props.titulo }}
+            </v-card-subtitle>
+            <v-card-text style="white-space: pre-wrap;">
                 {{ props.descricao }}
             </v-card-text>
             <section>

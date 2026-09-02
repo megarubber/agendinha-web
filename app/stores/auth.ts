@@ -2,12 +2,11 @@ import type UserToken from "~~/shared/types/userToken";
 import type UserAuth from "~~/shared/types/userAuth";
 import type Notification from "~~/shared/types/notification";
 import type GoogleTokens from "~~/shared/types/googleTokens";
-import getUserInfo from "~/server/api/user/getUserInfo";
-import login from "~/server/api/login/login";
-import loginWithOAuth2 from "~/server/api/google/loginWithOAuth2";
+import type UserGoogleAuth from "~~/shared/types/userGoogleAuth";
+import { googleSdkLoaded } from "vue3-google-login";
 import { Role } from "~~/shared/types/role";
 import type User from "~~/shared/types/user";
-type Callback = (status: number, confirmRegister: boolean) => void;
+type Callback = (status: number, data: any) => void;
 
 export const useAuthStore = defineStore("auth", {
   state: () => ({
@@ -21,7 +20,12 @@ export const useAuthStore = defineStore("auth", {
   actions: {
     async refreshAuth() {
       try {
-        const info: any = await getUserInfo(user.id_usuario);
+        const config = useRuntimeConfig();
+
+        const info: any = await await useApi(
+          `${config.apiBase}/usuarios/${user.id_usuario}`,
+          { method: "GET" }
+        );
         if(info.status != 200) return { status: info.status };
 
         const data = info.data;
@@ -44,7 +48,15 @@ export const useAuthStore = defineStore("auth", {
       return { status: 200 };
     },
     async authenticateUser(user_auth: UserAuth) {
-      const response: any = await login(user_auth);
+      const config = useRuntimeConfig();
+
+      const response: any = await useApi(
+        `${config.apiBase}/usuarios/login/`,
+        {
+          method: "POST",
+          body: user_auth
+        }
+      );
 
       if (response.status == 200) {
         const data: UserToken = response.data;
@@ -59,24 +71,83 @@ export const useAuthStore = defineStore("auth", {
       
       return response.status;
     },
-    async authenticateUserGoogle(callback: Callback) {     
-      loginWithOAuth2(async (status: number, data: any) => {
-        if(status != 200) {
-          callback(status, false);
-          return;
-        }
+    async authenticateUserGoogle(endRequest: Callback) {
+      const config = useRuntimeConfig();
 
-        const token = useCookie("token");
-        token.value = data.loginRequest.token;
+      googleSdkLoaded((google) => {
+        google.accounts.oauth2.initCodeClient({
+          client_id: config.public.googleClientId,
+          scope: 'email profile openid',
+          callback: async (response: any) => {
+            let responseCode = 400;
 
-        this.user = data.loginRequest.usuario;
-        this.googleTokens = data.tokens;
-        
-        if(!this.user.cadastro_confirmado) callback(status, false);
-        else {
-          this.notifications = data.notificacoes;
-          callback(status, true);
-        }
+            const tokens: any = await $fetch(
+              "https://oauth2.googleapis.com/token",
+              {
+                method: "POST",
+                body: JSON.stringify({
+                  code: response.code,
+                  client_id: config.public.googleClientId,
+                  client_secret: config.public.googleClientSecret,
+                  redirect_uri: "postmessage",
+                  grant_type: "authorization_code",
+                }),
+              },
+            );
+                    
+            if(!tokens.access_token || !tokens.id_token) {
+              responseCode = 400;
+              endRequest(responseCode, {});
+              return;
+            }
+
+            const info: any = await $fetch(
+              "https://www.googleapis.com/oauth2/v3/userinfo",
+              {
+                headers: {
+                  Authorization: `Bearer ${tokens.access_token}`,
+                },
+              },
+            );
+
+            if(!info.email) {
+              responseCode = 400;
+              endRequest(responseCode, {});
+              return;
+            }
+            
+            const auth: UserGoogleAuth = {
+              token: tokens.id_token as string,
+              email: info.email as string
+            }
+
+            const login: any = await $fetch(`${config.apiBase}/usuarios/login/google`, {
+              method: "POST",
+              body: auth,
+            });
+
+            responseCode = login.status;
+
+            const loginData = login.data;
+
+            endRequest(responseCode, {
+              tokens,
+              loginRequest: loginData 
+            });
+
+            const token = useCookie("token");
+            token.value = loginData.token;
+
+            this.user = loginData.usuario;
+            this.googleTokens = tokens;
+            
+            if(!this.user.cadastro_confirmado) endRequest(responseCode, false);
+            else {
+              this.notifications = loginData.notificacoes;
+              endRequest(responseCode, true);
+            }
+          }
+        }).requestCode();
       });
     },
     logUserOut() {

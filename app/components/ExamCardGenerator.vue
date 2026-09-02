@@ -13,12 +13,12 @@
       color="#E6F6FE"
       rounded="xl"
       class="card mb-2"
-      :subtitle="exam.titulo"
+      :subtitle="formatDate(convertToISODate(exam.data)).weekday + ' - ' + exam.titulo"
       :text="exam.local"
     >
       <template #title>
-        <span class="font-weight-bold">
-          {{ formatDate(convertToISODate(exam.data)).weekday }}
+        <span class="font-weight-bold text-wrap">
+          {{ exam.nome_paciente || 'Paciente Desconhecido' }}
         </span>
       </template>
       <template #append>

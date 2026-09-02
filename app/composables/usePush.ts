@@ -1,5 +1,5 @@
 import urlBase64ToUint8Array from "~/utils/urlBase64ToUint8Array";
-import arrayBufferToBase64Legacy from "~/server/utils/arrayBufferToBase64";
+import arrayBufferToBase64Legacy from "~/utils/arrayBufferToBase64";
 
 export const usePush = async (id_usuario: number) => {
   if (!("serviceWorker" in navigator)) return;

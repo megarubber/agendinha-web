@@ -3,4 +3,7 @@ export default interface CalendarAttributes {
     highlight?: any;
     dates: Date;
     bar?: any;
+    popover?: {
+        label: string;
+    };
 }
