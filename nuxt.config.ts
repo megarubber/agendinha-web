@@ -27,7 +27,7 @@ export default defineNuxtConfig({
   pwa: {
     registerType: 'autoUpdate',
     manifest: {
-      name: 'Agendinha GRAACC',
+      name: 'Agendinha',
       short_name: 'Agendinha',
       theme_color: '#000000'
     }
@@ -36,7 +36,7 @@ export default defineNuxtConfig({
     customCollections: [
       {
         prefix: "icons",
-        dir: "./assets/icons",
+        dir: "./app/assets/icons",
       },
     ],
   },
@@ -57,9 +57,5 @@ export default defineNuxtConfig({
       vapidPrivateKey: process.env.NUXT_VAPID_PRIVATE_KEY
     },
   },
-  components: [
-    '~/components',
-    { path: "~/pages", pattern: '**/subpages/**', pathPrefix: false },
-  ],
   css: ['~/assets/css/main.css'],
 });

@@ -52,9 +52,9 @@
 </template>
 
 <script lang="ts">
-import { useAuthStore } from "~/app/store/auth";
-import { useLoaderStore } from "~/app/store/loader";
-import { validateEmail } from '~/server/utils/others/validate';
+import { useAuthStore } from "~/stores/auth";
+import { useLoaderStore } from "~/stores/loader";
+import { validateEmail } from '~/server/utils/validate';
 
 export default defineComponent({
   name: "Login",

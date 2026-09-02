@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import { useLoaderStore } from './app/store/loader';
+import { useLoaderStore } from './stores/loader';
 
 const loader = useLoaderStore();
 
