@@ -5,7 +5,7 @@ import type GoogleTokens from "~~/shared/types/googleTokens";
 import type UserGoogleAuth from "~~/shared/types/userGoogleAuth";
 import { googleSdkLoaded } from "vue3-google-login";
 import { Role } from "~~/shared/types/role";
-import type User from "~~/shared/types/user";
+import type { User } from "~~/shared/types/user";
 type Callback = (status: number, data: any) => void;
 
 export const useAuthStore = defineStore("auth", {
@@ -22,8 +22,8 @@ export const useAuthStore = defineStore("auth", {
       try {
         const config = useRuntimeConfig();
 
-        const info: any = await await useApi(
-          `${config.apiBase}/usuarios/${user.id_usuario}`,
+        const info: any = await useApi(
+          `${config.apiBase}/usuarios/${this.user.id_usuario}`,
           { method: "GET" }
         );
         if(info.status != 200) return { status: info.status };
@@ -79,7 +79,7 @@ export const useAuthStore = defineStore("auth", {
           client_id: config.public.googleClientId,
           scope: 'email profile openid',
           callback: async (response: any) => {
-            let responseCode = 400;
+            let responseCode;
 
             const tokens: any = await $fetch(
               "https://oauth2.googleapis.com/token",

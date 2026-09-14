@@ -47,17 +47,17 @@
     </v-bottom-sheet>
 </template>
 <script lang="ts" setup>
-import type ShowExam from "~/interfaces/showExam";
-import type Exam from "~/interfaces/exam";
-import createTaskIntoCalendar from "~/server/api/google/createTaskIntoCalendar";
-import { useAuthStore } from "~/app/store/auth";
-import { useLoaderStore } from "~/app/store/loader";
-import type GoogleTokens from "~/interfaces/googleTokens";
+import type ShowExam from "~~/shared/types/showExam";
+import type Exam from "~~/shared/types/exam";
+import { useAuthStore } from "~/stores/auth";
+import { useLoaderStore } from "~/stores/loader";
+import type GoogleTokens from "~~/shared/types/googleTokens";
 
 const toast: any = useNuxtApp().$toast;
 const props = defineProps<ShowExam>();
 const auth = useAuthStore();
 const loader = useLoaderStore();
+const googleCalendar = useGoogleCalendar();
 const emit = defineEmits(['close']);
 
 const status = ref(false);
@@ -66,7 +66,7 @@ status.value = props.show;
 async function moveToGoogleCalendar() {
     loader.startLoading();
     emit("close");
-    const response = await createTaskIntoCalendar({
+    const response: any = await googleCalendar.createTaskIntoCalendar({
         id_agendamento: props.id_agendamento,
         id_paciente: props.id_paciente,
         titulo: props.titulo,

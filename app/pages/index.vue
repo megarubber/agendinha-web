@@ -101,14 +101,13 @@
 </template>
 
 <script lang="ts">
-import type Exam from "~/interfaces/exam";
-import getUserExams from "~/server/api/exams/getUserExams";
-import convertToISODate from "~/server/utils/others/convertToISODate";
+import type Exam from "~~/shared/types/exam";
+import convertToISODate from "~/utils/convertToISODate";
 import moment from "moment";
-import { useLoaderStore } from "~/app/store/loader";
-import type CalendarAttributes from "~/interfaces/calendarAttributes";
-import type CalendarDay from "~/interfaces/calendarDay";
-import { useAuthStore } from "~/app/store/auth";
+import { useLoaderStore } from "~/stores/loader";
+import type CalendarAttributes from "~~/shared/types/calendarAttributes";
+import type CalendarDay from "~~/shared/types/calendarDay";
+import { useAuthStore } from "~/stores/auth";
 
 export default defineComponent({
   name: "Home",

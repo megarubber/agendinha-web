@@ -1,6 +1,6 @@
 import { Role } from "#imports";
 
-export default interface User {
+export interface User {
   id_usuario: number;
   nome: string;
   email: string;

@@ -31,8 +31,8 @@
 </template>
 
 <script lang="ts" setup>
-import type Exam from "~/interfaces/exam";
-import convertToISODate from "~/server/utils/others/convertToISODate";
+import type Exam from "~~/shared/types/exam";
+import convertToISODate from "~/utils/convertToISODate";
 
 defineProps({
   exams: {
@@ -69,8 +69,7 @@ function formatDate(date: Date): any {
   ];
 
   const formattedDate = date.toLocaleDateString("pt-BR");
-  const formattedTime = date
-    .toLocaleTimeString("pt-BR", {
+  const formattedTime = date.toLocaleTimeString("pt-BR", {
       hour: "2-digit",
       minute: "2-digit",
     })
@@ -78,7 +77,7 @@ function formatDate(date: Date): any {
 
   return {
     weekday: `${weekdays[date.getDay()]} às ${formattedTime}`,
-    day: formattedDate[0] + formattedDate[1],
+    day: `${formattedDate[0]}${formattedDate[1]}`,
     month: months[date.getMonth()],
   };
 }

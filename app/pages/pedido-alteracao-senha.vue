@@ -35,9 +35,8 @@
 </template>
 
 <script lang="ts" setup>
-import requestNewPassword from '~/server/api/register/requestNewPassword';
-import { useLoaderStore } from '~/app/store/loader';
-import { validateEmail } from '~/server/utils/others/validate';
+import { useLoaderStore } from '~/stores/loader';
+import { validateEmail } from '~/utils/validate';
 
 const email = ref("");
 const toast: any = useNuxtApp().$toast;
@@ -52,7 +51,13 @@ async function request() {
   }
 
   loader.startLoading();
-  const response = await requestNewPassword(email.value);
+  const response: any = await useApi(
+    "/usuarios/redefinir-senha",    
+    {
+      body: { email: email.value },
+      method: "POST"
+    }
+  );
 
   if(response.status == 200) {
     toast.success("Pedido enviado.");
