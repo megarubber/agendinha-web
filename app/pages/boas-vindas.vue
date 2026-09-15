@@ -5,7 +5,7 @@
             <template #prepend>
                 <v-app-bar-nav-icon>
                     <img
-                        src="public/images/agendinha_logo.png"
+                        src="/images/agendinha_logo.png"
                         class="logo">
                 </v-app-bar-nav-icon>
             </template>
