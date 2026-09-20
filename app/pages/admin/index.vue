@@ -48,6 +48,13 @@
 <script setup lang="ts">
 import { reactive, ref, onMounted } from "vue";
 import { useAppointments } from "~/composables/useAppointments";
+import { useLoaderStore } from "#imports";
+import { useAuthStore } from "#imports";
+
+const loader = useLoaderStore();
+const auth = useAuthStore();
+
+loader.endLoading();
 
 definePageMeta({
   middleware: [],
@@ -55,11 +62,8 @@ definePageMeta({
 
 const { createAppointment } = useAppointments();
 
-const { $toast } = useNuxtApp();
+const { $toast, $api } = useNuxtApp();
 
-const isAuthenticated = ref(false);
-const isLoggingIn = ref(false);
-const showPassword = ref(false);
 const isSaving = ref(false);
 
 const login = reactive({
@@ -76,47 +80,8 @@ const appointmentForm = reactive({
   doctor: "",
 });
 
-onMounted(() => {
-  const token = useCookie("token_recepcao");
-
-  if (token.value) {
-    isAuthenticated.value = true;
-  }
-});
-
-async function loginUser() {
-  if (!login.email || !login.password) {
-    return;
-  }
-
-  isLoggingIn.value = true;
-
-  try {
-    const response: any = await $fetch("/admin/login", {
-      method: "POST",
-      body: login,
-    });
-
-    if (response.status === 200) {
-      useCookie("token_recepcao").value = response.data.token;
-      isAuthenticated.value = true;
-    } else {
-      $toast?.error("E-mail ou senha incorretos.");
-    }
-  } catch {
-    $toast?.error("Erro ao fazer login.");
-  } finally {
-    isLoggingIn.value = false;
-  }
-}
-
 function logout() {
-  useCookie("token_recepcao").value = null;
-
-  isAuthenticated.value = false;
-
-  login.email = "";
-  login.password = "";
+  auth.logout();
 }
 
 async function saveAppointment() {

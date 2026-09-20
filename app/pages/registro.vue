@@ -87,8 +87,9 @@ export default defineComponent({
         this.loader.endLoading();
         return;
       }
-
-      const response: any = await useApi(
+      const { $api } = useNuxtApp();
+      
+      const response: any = await $api(
         "/usuarios/registrar",
         {
           method: "POST",

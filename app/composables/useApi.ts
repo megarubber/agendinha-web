@@ -4,7 +4,7 @@ export const useApi = createUseFetch(() => {
   return {
     baseURL: config.public.apiBase,
     onRequest({ options }) {
-      const token = useCookie('token').value
+      const token = useCookie('token').value;
       if (token) {
         options.headers = new Headers(options.headers);
 

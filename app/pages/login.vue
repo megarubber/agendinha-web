@@ -107,7 +107,8 @@ export default defineComponent({
       const status = await this.auth.authenticateUser(this.user);
 
       if (status == 200) {
-        this.$router.push("/");
+        if(this.auth.user.role == "ROLE_ADMIN") this.$router.push("/admin");
+        else this.$router.push("/");
         const permission = await Notification.requestPermission();
         if(permission == 'granted') await usePush(this.auth.user.id_usuario);
         return;

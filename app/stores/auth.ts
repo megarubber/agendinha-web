@@ -10,7 +10,7 @@ type Callback = (status: number, data: any) => void;
 
 export const useAuthStore = defineStore("auth", {
   state: () => ({
-    user: { } as User,
+    user: {} as User,
     authenticated: false,
     notifications: [] as Notification[],
     notReadNotifications: 0, 
@@ -20,10 +20,9 @@ export const useAuthStore = defineStore("auth", {
   actions: {
     async refreshAuth() {
       try {
-        const config = useRuntimeConfig();
-
-        const info: any = await useApi(
-          `${config.apiBase}/usuarios/${this.user.id_usuario}`,
+        const { $api } = useNuxtApp();
+        const info: any = await $api(
+          `/usuarios/${this.user.id_usuario}`,
           { method: "GET" }
         );
         if(info.status != 200) return { status: info.status };
@@ -48,32 +47,29 @@ export const useAuthStore = defineStore("auth", {
       return { status: 200 };
     },
     async authenticateUser(user_auth: UserAuth) {
-      const config = useRuntimeConfig();
+      const { $api } = useNuxtApp();
 
-      const response: any = await useApi(
-        `${config.apiBase}/usuarios/login/`,
-        {
-          method: "POST",
-          body: user_auth
-        }
+      const response: any = await $api('/usuarios/login',
+        { method: "POST", body: user_auth }
       );
 
       if (response.status == 200) {
         const data: UserToken = response.data;
+        console.log(data);
 
         const token = useCookie("token");
         token.value = data.token;
         
         this.user = data.usuario;
         this.notifications = data.notificacoes;
-        this.user.role = Role.User;
       }
       
       return response.status;
     },
     async authenticateUserGoogle(endRequest: Callback) {
       const config = useRuntimeConfig();
-
+      const { $api } = useNuxtApp();
+      
       googleSdkLoaded((google) => {
         google.accounts.oauth2.initCodeClient({
           client_id: config.public.googleClientId,
@@ -121,7 +117,7 @@ export const useAuthStore = defineStore("auth", {
               email: info.email as string
             }
 
-            const login: any = await $fetch(`${config.apiBase}/usuarios/login/google`, {
+            const login: any = await $api('/usuarios/login/google', {
               method: "POST",
               body: auth,
             });
@@ -150,7 +146,7 @@ export const useAuthStore = defineStore("auth", {
         }).requestCode();
       });
     },
-    logUserOut() {
+    logout() {
       const token = useCookie("token");
       this.authenticated = false;
       token.value = null;
