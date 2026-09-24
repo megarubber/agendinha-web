@@ -47,14 +47,14 @@
     </v-bottom-sheet>
 </template>
 <script lang="ts" setup>
-import type ShowExam from "~~/shared/types/showExam";
-import type Exam from "~~/shared/types/exam";
+import type ShowAppointment from "~~/shared/types/showAppointment";
+import type Appointment from "~~/shared/types/appointment";
 import { useAuthStore } from "~/stores/auth";
 import { useLoaderStore } from "~/stores/loader";
 import type GoogleTokens from "~~/shared/types/googleTokens";
 
 const toast: any = useNuxtApp().$toast;
-const props = defineProps<ShowExam>();
+const props = defineProps<ShowAppointment>();
 const auth = useAuthStore();
 const loader = useLoaderStore();
 const googleCalendar = useGoogleCalendar();
@@ -68,14 +68,13 @@ async function moveToGoogleCalendar() {
     emit("close");
     const response: any = await googleCalendar.createTaskIntoCalendar({
         id_agendamento: props.id_agendamento,
-        id_paciente: props.id_paciente,
         titulo: props.titulo,
         descricao: props.descricao,
         data: props.data,
         medico: props.medico,
         local: props.local,
         lembrete_enviado: props.lembrete_enviado
-    } as Exam);
+    } as Appointment);
 
     if(response.status == 200) {
         toast.success("Agendamento criado.");

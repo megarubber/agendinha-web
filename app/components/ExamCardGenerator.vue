@@ -31,7 +31,7 @@
 </template>
 
 <script lang="ts" setup>
-import type Exam from "~~/shared/types/exam";
+import type Exam from "~~/shared/types/appointment";
 import convertToISODate from "~/utils/convertToISODate";
 
 defineProps({
