@@ -48,10 +48,9 @@
     </v-bottom-sheet>
 </template>
 <script lang="ts" setup>
-import { useAuthStore } from "~/app/store/auth";
-import deleteAccount from "~/server/api/user/deleteAccount";
+import { useAuthStore } from "~/stores/auth";
 
-const toast: any = useNuxtApp().$toast;
+const { $api, $toast } = useNuxtApp();
 const auth = useAuthStore();
 const router = useRouter();
 const status = ref(false)
@@ -69,14 +68,22 @@ const props = defineProps({
 status.value = props.show;
 
 async function requestDelete(): Promise<void> {
-    const response = await deleteAccount(props.userId);
+    const token = useCookie("token");
+
+    const response: any = await $api("/usuarios/delete", {
+        method: "DELETE",
+        headers: {
+        Authorization: `Bearer ${token.value}`,
+        },
+        body: { id_usuario: props.userId }
+    });
 
     if(response.status != 200) {
-        toast.error("Erro ao deletar conta.")
+        $toast.error("Erro ao deletar conta.")
         return;
     }
 
-    auth.logUserOut();
+    auth.logout();
     router.push("/login");
 }
 </script>

@@ -48,8 +48,8 @@
 <script setup lang="ts">
 import { reactive, ref, onMounted } from "vue";
 import { useAppointments } from "~/composables/useAppointments";
-import { useLoaderStore } from "#imports";
-import { useAuthStore } from "#imports";
+import { useLoaderStore } from "~/stores/loader";
+import { useAuthStore } from "~/stores/auth";
 
 const loader = useLoaderStore();
 const auth = useAuthStore();
@@ -57,7 +57,8 @@ const auth = useAuthStore();
 loader.endLoading();
 
 definePageMeta({
-  middleware: [],
+  middleware: "auth",
+  requiresRole: "ROLE_ADMIN"
 });
 
 const { createAppointment } = useAppointments();

@@ -4,7 +4,6 @@ import type Notification from "~~/shared/types/notification";
 import type GoogleTokens from "~~/shared/types/googleTokens";
 import type UserGoogleAuth from "~~/shared/types/userGoogleAuth";
 import { googleSdkLoaded } from "vue3-google-login";
-import { Role } from "~~/shared/types/role";
 import type { User } from "~~/shared/types/user";
 type Callback = (status: number, data: any) => void;
 
@@ -55,11 +54,8 @@ export const useAuthStore = defineStore("auth", {
 
       if (response.status == 200) {
         const data: UserToken = response.data;
-        console.log(data);
-
         const token = useCookie("token");
         token.value = data.token;
-        
         this.user = data.usuario;
         this.notifications = data.notificacoes;
       }

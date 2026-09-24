@@ -44,7 +44,7 @@
 </template>
 
 <script lang="ts">
-import { useAuthStore } from '#imports';
+import { useAuthStore } from '~/stores/auth';
 
 export default defineComponent({
   name: "TheHeader",

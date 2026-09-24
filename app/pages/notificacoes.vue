@@ -51,10 +51,9 @@
 </template>
 
 <script lang="ts">
-import type Notification from "~/interfaces/notification";
-import getUserNotifications from "~/server/api/notifications/getUserNotifications";
-import { useLoaderStore } from "~/app/store/loader";
-import { useAuthStore } from "~/app/store/auth";
+import type Notification from "~~/shared/types/notification";
+import { useLoaderStore } from "~/stores/loader";
+import { useAuthStore } from "~/stores/auth";
 
 export default defineComponent({
   name: "Notifications",
@@ -95,8 +94,17 @@ export default defineComponent({
     },
     async updateNotifications() {
       this.loader.startLoading();
+      const { $api } = useNuxtApp();
+      const token = useCookie("token");
 
-      const notifications = await getUserNotifications(this.auth.user.id_usuario) ?? [];
+      const response = await $api(`/notificacoes/usuario/${this.auth.user.id_usuario}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token.value}`,
+        },
+      });
+
+      const notifications: Notification[] = response.data ?? [];
 
       if(notifications.length > 0) {
         this.readNotifications = notifications.filter(

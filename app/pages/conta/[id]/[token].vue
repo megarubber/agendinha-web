@@ -11,12 +11,28 @@
 </template>
 
 <script lang="ts" setup>
-import { useLoaderStore } from "~/app/store/loader";
-import confirmAccount from "~/server/api/register/confirmAccount";
+import { useLoaderStore } from "~/stores/loader";
+
 const route = useRoute();
 const loader = useLoaderStore();
 const toast: any = useNuxtApp().$toast;
 const router = useRouter();
+
+async function confirmAccount(data: string | number) {
+  const { $api } = useNuxtApp();
+  
+  let body: any = {};
+
+  if(isNumber(data)) body = { id_usuario: data };
+  else body = { email: data };
+
+  const response = await $api("/usuarios/confirmar", {
+    method: "POST",
+    body
+  });
+
+  return response;
+}
 
 async function request() {
     loader.startLoading();

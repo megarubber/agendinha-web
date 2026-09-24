@@ -47,13 +47,11 @@
     </v-bottom-sheet>
 </template>
 <script lang="ts" setup>
-import type ShowNotification from "~/interfaces/showNotification";
-import markNotificationAsRead from "~/server/api/notifications/markNotificationAsRead";
-import { useLoaderStore } from "~/app/store/loader";
-import deleteNotification from "~/server/api/notifications/deleteNotification";
+import type ShowNotification from "~~/shared/types/showNotification";
+import { useLoaderStore } from "~/stores/loader";
 
 const props = defineProps<ShowNotification>();
-const toast: any = useNuxtApp().$toast;
+const { $toast, $api } = useNuxtApp();
 const loader = useLoaderStore();
 
 const status = ref(false);
@@ -62,10 +60,14 @@ const emit = defineEmits(['close', 'read', 'delete']);
 
 async function markAsRead() {
     loader.startLoading();
-    const response = await markNotificationAsRead(props.id);
+    const token = useCookie("token");
+    const response: any = await $api(`/notificacoes/${props.id}/lida`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token.value}` },
+    });
 
     if(response.status != 200) {
-        toast.error("Erro ao marcar notificação como lida.");
+        $toast.error("Erro ao marcar notificação como lida.");
         loader.endLoading();
         return;
     }
@@ -77,10 +79,14 @@ async function markAsRead() {
 
 async function deleteOpenedNotification() {
     loader.startLoading();
-    const response = await deleteNotification(props.id);
+    const token = useCookie("token");
+    const response: any = await $api(`/notificacoes/id/${props.id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token.value}` },
+    });
 
     if(response.status != 200) {
-        toast.error("Erro ao deletar notificação.");
+        $toast.error("Erro ao deletar notificação.");
         loader.endLoading();
         return;
     }

@@ -48,10 +48,9 @@
 </template>
 
 <script lang="ts">
-import type UserNewPasswordWithLogin from "~/interfaces/userNewPasswordWithLogin";
-import { useAuthStore } from "~/app/store/auth";
-import { useLoaderStore } from "~/app/store/loader";
-import setNewPasswordWithLogin from "~/server/api/user/setNewPasswordWithLogin";
+import type UserNewPasswordWithLogin from "~~/shared/types/userNewPasswordWithLogin";
+import { useAuthStore } from "~/stores/auth";
+import { useLoaderStore } from "~/stores/loader";
 
 export default defineComponent({
   name: "UpdatePassword",
@@ -89,12 +88,17 @@ export default defineComponent({
           return;
         }
 
-        const data: UserNewPasswordWithLogin = {
+        const body: UserNewPasswordWithLogin = {
           id: this.auth.user.id_usuario,
           senha_atual: this.user.senhaAtual.value,
           senha_nova: this.user.novaSenha.value
         }
-        const response = await setNewPasswordWithLogin(data);
+
+        const { $api } = useNuxtApp();
+
+        const response: any = await $api("/usuarios/redefinir-senha", {
+          method: "PUT", body
+        });
 
         if(response.status == 401 || response.status == 400) {
           this.toast.error("Senha atual digitada não coincide com a salva.");

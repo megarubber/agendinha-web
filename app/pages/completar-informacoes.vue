@@ -26,17 +26,18 @@
 </template>
 
 <script lang="ts" setup>
-import { useAuthStore } from "~/app/store/auth";
-import updateUserInfo from "~/server/api/user/updateUserInfo";
-import type UserUpdate from "~/interfaces/userUpdate";
-import { useLoaderStore } from "~/app/store/loader";
-import confirmAccount from "~/server/api/register/confirmAccount";
+import { useAuthStore } from "~/stores/auth";
+import type UserUpdate from "~~/shared/types/userUpdate";
+import { useLoaderStore } from "~/stores/loader";
+import isNumber from "~/utils/isNumber";
 
 const auth = useAuthStore();
 const loader = useLoaderStore();
 const { user } = storeToRefs(auth);
-const toast: any = useNuxtApp().$toast;
+const { $toast } = useNuxtApp();
 const router = useRouter();
+
+definePageMeta({ middleware: "auth", requiresRole: "ROLE_USER" });
 
 const formUser = {
   nomeResponsavel: ref(user.value.nome as string),
@@ -44,10 +45,40 @@ const formUser = {
   idPaciente: ref(null)
 };
 
+async function updateUserInfo(userInfo: UserUpdate) {
+  const { $api } = useNuxtApp();
+  const token = useCookie("token");
+
+  const response = await $api("/usuarios/update", {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${token.value}`,
+    },
+    body: userInfo
+  });
+  return response;
+}
+
+async function confirmAccount(data: string | number) {
+  const { $api } = useNuxtApp();
+  
+  let body: any = {};
+
+  if(isNumber(data)) body = { id_usuario: data };
+  else body = { email: data };
+
+  const response = await $api("/usuarios/confirmar", {
+    method: "POST",
+    body
+  });
+
+  return response;
+}
+
 async function update() {
   loader.startLoading();
   if(formUser.idPaciente.value == null) {
-    toast.error("ID do paciente inválido.");
+    $toast.error("ID do paciente inválido.");
     loader.endLoading();
     return;
   }
@@ -64,7 +95,7 @@ async function update() {
 
   for(const response of responses) {
     if(response.status != 200 && response.status != 204) {
-      toast.error("Erro ao atualizar dados.");
+      $toast.error("Erro ao atualizar dados.");
       loader.endLoading();
       return;
     }

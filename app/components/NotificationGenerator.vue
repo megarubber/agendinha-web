@@ -19,7 +19,7 @@
 </template>
 
 <script lang="ts" setup>
-import type Notification from "~/interfaces/notification";
+import type Notification from "~~/shared/types/notification";
 
 const props = defineProps({
   notifications: {

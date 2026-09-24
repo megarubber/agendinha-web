@@ -30,11 +30,9 @@
 </template>
 
 <script lang="ts" setup>
-import setNewPasswordWithoutLogin from '~/server/api/register/setNewPasswordWithoutLogin';
-import type UserNewPasswordWithoutLogin from '~/interfaces/userNewPasswordWithoutLogin';
-import { useLoaderStore } from '~/app/store/loader';
+import type UserNewPasswordWithoutLogin from '~~/shared/types/userNewPasswordWithoutLogin';
+import { useLoaderStore } from '~/stores/loader';
 const route = useRoute();
-const toast: any = useNuxtApp().$toast;
 const loader = useLoaderStore();
 const router = useRouter();
 
@@ -44,35 +42,38 @@ const confirmPassword = ref("");
 const showConfirmPassword = ref(false);
 
 async function updatePassword() {
-    loader.startLoading();
+  const { $api, $toast } = useNuxtApp();
+  loader.startLoading();
 
-    if(password.value != confirmPassword.value) {
-        toast.error("Senhas não são iguais.");
-        loader.endLoading();
-        return;
-    }
-
-    const data: UserNewPasswordWithoutLogin = {
-        id: Number(route.params.id || '0'),
-        senha_nova: password.value
-    }
-
-    const response = await setNewPasswordWithoutLogin(data);
-
-    if(response.status == 401) {
-        toast.error("Usuário não existe.");
-        loader.endLoading();
-        return;
-    }
-
-    if(response.status != 200) {
-        toast.error("Erro ao alterar senha.");
-        loader.endLoading();
-        return;
-    }
-
-    toast.success("Senha alterada com sucesso!");
-    router.push("/login");
+  if(password.value != confirmPassword.value) {
+    $toast.error("Senhas não são iguais.");
     loader.endLoading();
+    return;
+  }
+
+  const body: UserNewPasswordWithoutLogin = {
+    id: Number(route.params.id || '0'),
+    senha_nova: password.value
+  }
+
+  const response: any = await $api("/usuarios/redefinir-senha", {
+    method: "PUT", body
+  });
+
+  if(response.status == 401) {
+    $toast.error("Usuário não existe.");
+    loader.endLoading();
+    return;
+  }
+
+  if(response.status != 200) {
+    $toast.error("Erro ao alterar senha.");
+    loader.endLoading();
+    return;
+  }
+
+  $toast.success("Senha alterada com sucesso!");
+  router.push("/login");
+  loader.endLoading();
 }
 </script>

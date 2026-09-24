@@ -52,7 +52,7 @@ async function request() {
 
   loader.startLoading();
   const response: any = await useApi(
-    "/usuarios/redefinir-senha",    
+    "/usuarios/redefinir-senha/pedido",    
     {
       body: { email: email.value },
       method: "POST"

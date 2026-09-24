@@ -101,7 +101,7 @@
 </template>
 
 <script lang="ts">
-import type Exam from "~~/shared/types/exam";
+import type Exam from "~~/shared/types/appointment";
 import convertToISODate from "~/utils/convertToISODate";
 import moment from "moment";
 import { useLoaderStore } from "~/stores/loader";
@@ -112,7 +112,11 @@ import { useAuthStore } from "~/stores/auth";
 export default defineComponent({
   name: "Home",
   setup() {
-    definePageMeta({ middleware: "auth", showHeader: true });
+    definePageMeta({ 
+      middleware: "auth", 
+      showHeader: true,
+      requiresRole: "ROLE_USER"
+    });
   },
   data() {
     return {
@@ -146,7 +150,17 @@ export default defineComponent({
   },
   async mounted() {
     this.loader.startLoading();
-    this.allExams = await getUserExams() ?? [];
+    const { $api } = useNuxtApp();
+    const token = useCookie("token");
+
+    const response = await $api("/agendamentos/usuario", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token.value}`,
+      },
+    });
+    
+    this.allExams = response.data ?? [];
 
     if(this.allExams.length <= 0) {
       this.loader.endLoading();

@@ -52,7 +52,7 @@
 export default defineComponent({
   name: "SettingsNotifications",
   setup() {
-    definePageMeta({ middleware: "auth" });
+    definePageMeta({ middleware: "auth", requiresRole: "ROLE_USER" });
   },
   data() {
     return {

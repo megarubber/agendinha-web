@@ -49,64 +49,59 @@
   </v-container>
 </template>
 
-<script lang="ts">
-import changePage from '~/server/utils/others/changePage';
-import openMap from '~/server/utils/others/openMap';
-import copyToClipboard from '~/server/utils/others/copyToClipboard';
+<script setup lang="ts">
+import changePage from '~/utils/changePage';
+import openMap from '~/utils/openMap';
+import copyToClipboard from '~/utils/copyToClipboard';
 
-export default defineComponent({
-  name: "Contacts",
-  setup() {
-    definePageMeta({ middleware: "auth", showHeader: true });
-  },
-  data() {
-    return {
-      toast: useNuxtApp().$toast as any,
-      contacts: [
-        {
-          icon: "phone",
-          title: "Telefone",
-          info: ["(12) 98245-4711"],
-          action: "Ligar",
-          callbackAction: () => changePage('tel:+1298245-4711'),
-          callbackClipboard: () => this.copy("(12) 98245-4711")
-        },
-        {
-          icon: "email",
-          title: "E-mail",
-          info: ["aparte@gmail.com.br"],
-          action: "Enviar e-mail",
-          callbackAction: () => changePage('mailto:aparte@gmail.com.br'),
-          callbackClipboard: () => this.copy("aparte@gmail.com.br")
-        },
-        {
-          icon: "map-marker",
-          title: "Endereço",
-          info: [
-            "Av. Santa Cruz do Areão, 2495",
-            "Res. Santa Izabel, Taubaté - SP",
-            "CEP: 12061-100",
-            
-          ],
-          action: "Abrir no mapa",
-          callbackAction: () => openMap(-22.9924362, -45.5746279),
-          callbackClipboard: () => this.copy("Av. Santa Cruz do Areão, 2495, Res. Santa Izabel, Taubaté - SP, CEP: 12061-100")
-        },
-      ],
-    };
-  },
-  methods: {
-    copy(data: string) {
-      try {
-        copyToClipboard(data);
-        this.toast.success("Copiado com sucesso!");        
-      } catch(error) {
-        this.toast.error("Houve um erro ao copiar.");
-        console.error(error);
-      }
-    }
-  }
+definePageMeta({ 
+  middleware: "auth", 
+  showHeader: true,
+  requiresRole: "ROLE_USER"
 });
+
+function copy(data: string) {
+  try {
+    copyToClipboard(data);
+    $toast.success("Copiado com sucesso!");        
+  } catch(error) {
+    $toast.error("Houve um erro ao copiar.");
+    console.error(error);
+  }
+}
+
+const { $toast } = useNuxtApp();
+const contacts = [
+  {
+    icon: "phone",
+    title: "Telefone",
+    info: ["(12) 98245-4711"],
+    action: "Ligar",
+    callbackAction: () => changePage('tel:+1298245-4711'),
+    callbackClipboard: () => copy("(12) 98245-4711")
+  },
+  {
+    icon: "email",
+    title: "E-mail",
+    info: ["aparte@gmail.com.br"],
+    action: "Enviar e-mail",
+    callbackAction: () => changePage('mailto:aparte@gmail.com.br'),
+    callbackClipboard: () => copy("aparte@gmail.com.br")
+  },
+  {
+    icon: "map-marker",
+    title: "Endereço",
+    info: [
+      "Av. Santa Cruz do Areão, 2495",
+      "Res. Santa Izabel, Taubaté - SP",
+      "CEP: 12061-100",
+      
+    ],
+    action: "Abrir no mapa",
+    callbackAction: () => openMap(-22.9924362, -45.5746279),
+    callbackClipboard: () => copy("Av. Santa Cruz do Areão, 2495, Res. Santa Izabel, Taubaté - SP, CEP: 12061-100")
+  },
+];
 </script>
 
 <style scoped>

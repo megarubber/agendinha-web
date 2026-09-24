@@ -20,7 +20,6 @@
 </template>
 
 <script lang="ts" setup>
-import updateProfileImage from '~/server/api/user/updateProfileImage';
 const props = defineProps<{id: number, size: number, mainImage: string}>();
 const image = ref('');
 
@@ -37,9 +36,27 @@ async function handleCapture(event: Event) {
     const fileReader: FileReader = new FileReader();
     fileReader.onload = (eventFile) => image.value = eventFile.target!.result as string;
     fileReader.readAsDataURL(file);
-    await updateProfileImage({
-      id, foto_perfil: file
+    const { $api, $toast } = useNuxtApp();
+    const token = useCookie("token");
+    
+    const formData = new FormData();
+    formData.append("id", `${id}`);
+    formData.append("foto_perfil", file);
+
+    const response: any = await $api("/usuarios/foto", {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token.value}`,
+      },
+      body: formData
     });
+
+    if(response.status == 200) {
+      $toast.success("Imagem de perfil alterada com sucesso.");
+      return;
+    }
+
+    $toast.error("Não foi possível alterar a imagem de perfil.");
   }
 };
 

@@ -45,15 +45,14 @@
 </template>
 
 <script lang="ts">
-import type UserUpdate from "~/interfaces/userUpdate";
-import updateUserInfo from "~/server/api/user/updateUserInfo";
-import { useAuthStore } from "~/app/store/auth";
-import { useLoaderStore } from "~/app/store/loader";
+import type UserUpdate from "~~/shared/types/userUpdate";
+import { useAuthStore } from "~/stores/auth";
+import { useLoaderStore } from "~/stores/loader";
 
 export default defineComponent({
   name: "UpdateProfile",
   setup() {
-    definePageMeta({ middleware: "auth" });
+    definePageMeta({ middleware: "auth", requiresRole: "ROLE_USER" });
   },
   data() {
     return {
@@ -86,7 +85,16 @@ export default defineComponent({
       };
 
       try {
-        const response = await updateUserInfo(userUpdate);
+        const { $api } = useNuxtApp();
+        const token = useCookie("token");
+        const response: any = await $api("/usuarios/update", {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token.value}`,
+          },
+          body: userUpdate
+        });
+        
         if(response.status == 200 || response.status == 201) {
           this.toast.success("Alteração feita com sucesso.");
           this.$router.push("/perfil");

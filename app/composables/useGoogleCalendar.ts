@@ -1,4 +1,4 @@
-import type Exam from "#shared/types/exam";
+import type Exam from "~~/shared/types/appointment";
 import { useAuthStore } from "~/stores/auth";
 
 export function useGoogleCalendar() {

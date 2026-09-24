@@ -52,7 +52,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useAuthStore } from "~/app/store/auth";
+import { useAuthStore } from "~/stores/auth";
 import { storeToRefs } from "pinia";
 const config = useRuntimeConfig();
 const showDelete = ref(false);
@@ -66,7 +66,7 @@ profileImageURL.value = user.value.foto_perfil ?
 `${config.public.apiBase}${user.value.foto_perfil}` : 'no-image';
 
 function logUserOut(): void {
-  auth.logUserOut();
+  auth.logout();
 }
 
 function requestDelete(): void {
