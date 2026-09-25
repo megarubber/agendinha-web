@@ -1,42 +1,42 @@
 <template>
   <div
-    v-for="exam in exams"
-    :key="exam.id_agendamento"
+    v-for="appointment in appointments"
+    :key="appointment.id_agendamento"
     class="d-flex justify-space-between align-center w-100"
   >
     <section class="text-center text-h6 text-blue-dark font-weight-bold">
-      <p>{{ formatDate(convertToISODate(exam.data)).day }}</p>
-      <p>{{ formatDate(convertToISODate(exam.data)).month }}</p>
+      <p>{{ formatDate(convertToISODate(appointment.data)).day }}</p>
+      <p>{{ formatDate(convertToISODate(appointment.data)).month }}</p>
     </section>
     <v-card
       variant="flat"
       color="#E6F6FE"
       rounded="xl"
       class="card mb-2"
-      :subtitle="formatDate(convertToISODate(exam.data)).weekday + ' - ' + exam.titulo"
-      :text="exam.local"
+      :subtitle="formatDate(convertToISODate(appointment.data)).weekday + ' - ' + appointment.titulo"
+      :text="appointment.local"
     >
       <template #title>
         <span class="font-weight-bold text-wrap">
-          {{ exam.nome_paciente || 'Paciente Desconhecido' }}
+          {{ appointment.nome_paciente || 'Paciente Desconhecido' }}
         </span>
       </template>
       <template #append>
         <v-icon
         class="mt-6" color="blue-dark" size="35" 
-        icon="mdi-chevron-right" @click="$emit('requestDetails', exam)"/>
+        icon="mdi-chevron-right" @click="$emit('requestDetails', appointment)"/>
       </template>
     </v-card>
   </div>
 </template>
 
 <script lang="ts" setup>
-import type Exam from "~~/shared/types/appointment";
+import type Appointment from "~~/shared/types/appointment";
 import convertToISODate from "~/utils/convertToISODate";
 
 defineProps({
-  exams: {
-    type: Array as PropType<Exam[]>,
+  appointments: {
+    type: Array as PropType<Appointment[]>,
     required: true,
   }
 });

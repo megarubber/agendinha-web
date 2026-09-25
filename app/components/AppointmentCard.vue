@@ -53,7 +53,7 @@ import { useAuthStore } from "~/stores/auth";
 import { useLoaderStore } from "~/stores/loader";
 import type GoogleTokens from "~~/shared/types/googleTokens";
 
-const toast: any = useNuxtApp().$toast;
+const { $toast } = useNuxtApp();
 const props = defineProps<ShowAppointment>();
 const auth = useAuthStore();
 const loader = useLoaderStore();
@@ -77,7 +77,7 @@ async function moveToGoogleCalendar() {
     } as Appointment);
 
     if(response.status == 200) {
-        toast.success("Agendamento criado.");
+        $toast.success("Agendamento criado.");
         const newTokens: any = response.data.tokens;
         if('access_token' in newTokens) {
             auth.googleTokens = {
@@ -90,7 +90,7 @@ async function moveToGoogleCalendar() {
         return;
     }
 
-    toast.error("Erro ao criar agendamento.");
+    $toast.error("Erro ao criar agendamento.");
     loader.endLoading();
 }
 </script>

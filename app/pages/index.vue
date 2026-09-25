@@ -36,11 +36,11 @@
       </v-tabs>
       <v-tabs-window v-model="tab" class="px-3">
         <v-tabs-window-item value="appointment">
-          <section v-if="noExams">
+          <section v-if="noAppointments">
             <p class="text-center">Sem compromissos nas próximas semanas.</p>
           </section>
           <section v-else>
-            <section v-if="weekExams.length > 0" class="scroll">
+            <section v-if="weekAppointments.length > 0" class="scroll">
               <p class="mb-2">
                 {{ statusMessage.begin }}
                 <span class="text-blue-dark font-weight-bold">{{
@@ -49,13 +49,13 @@
                 {{ statusMessage.end }} para esta semana.
               </p>
               <section class="scroll">
-                <exam-card-generator :exams="weekExams" @request-details="(exam: Exam) => requestDetails(exam)" />
+                <appointment-card-generator :appointments="weekAppointments" @request-details="(appointment: Appointment) => requestDetails(appointment)" />
               </section>
             </section>
-            <section v-if="futureExams.length > 0">
+            <section v-if="futureAppointments.length > 0">
               <p class="mt-4 mb-4">Compromissos futuros</p>
               <section class="scroll">
-                <exam-card-generator :exams="futureExams" @request-details="(exam: Exam) => requestDetails(exam)" />
+                <appointment-card-generator :appointments="futureAppointments" @request-details="(appointment: Appointment) => requestDetails(appointment)" />
               </section>
             </section>
           </section>
@@ -73,9 +73,9 @@
               />
             </client-only>
           </section>
-          <section v-if="dayExams.length > 0" class="scroll">
+          <section v-if="dayAppointments.length > 0" class="scroll">
             <p class="mt-4 mb-4">Compromissos marcados nesse dia</p>
-            <exam-card-generator :exams="dayExams" @request-details="(exam: Exam) => requestDetails(exam)"/>
+            <appointment-card-generator :appointments="dayAppointments" @request-details="(appointment: Appointment) => requestDetails(appointment)"/>
           </section>
           <section v-else class="text-center mt-8">
             Nenhum compromisso nesse dia
@@ -83,25 +83,25 @@
         </v-tabs-window-item>
       </v-tabs-window>
     </div>
-    <div v-if="showExamDetails">
-      <exam-card
-        :id_agendamento="selectedExam.id_agendamento"
-        :titulo="selectedExam.titulo"
-        :descricao="selectedExam.descricao"
-        :medico="selectedExam.medico"
-        :data="selectedExam.data"
-        :local="selectedExam.local"
-        :lembrete_enviado="selectedExam.lembrete_enviado"
-        :show="showExamDetails"
+    <div v-if="showAppointmentDetails">
+      <appointment-card
+        :id_agendamento="selectedAppointment.id_agendamento"
+        :titulo="selectedAppointment.titulo"
+        :descricao="selectedAppointment.descricao"
+        :medico="selectedAppointment.medico"
+        :data="selectedAppointment.data"
+        :local="selectedAppointment.local"
+        :lembrete_enviado="selectedAppointment.lembrete_enviado"
+        :show="showAppointmentDetails"
         :modo_google="auth.googleTokens.access_token != undefined"
-        @close="showExamDetails = !showExamDetails"
+        @close="showAppointmentDetails = !showAppointmentDetails"
       />
     </div>
   </v-container>
 </template>
 
 <script lang="ts">
-import type Exam from "~~/shared/types/appointment";
+import type Appointment from "~~/shared/types/appointment";
 import convertToISODate from "~/utils/convertToISODate";
 import moment from "moment";
 import { useLoaderStore } from "~/stores/loader";
@@ -121,18 +121,18 @@ export default defineComponent({
   data() {
     return {
       loader: useLoaderStore(),
-      weekExams: ref([] as Exam[]),
-      futureExams: ref([] as Exam[]),
-      dayExams: [] as Exam[],
-      allExams: ref([] as Exam[]),
-      searchedExams: ref([] as Exam[]),
+      weekAppointments: ref([] as Appointment[]),
+      futureAppointments: ref([] as Appointment[]),
+      dayAppointments: [] as Appointment[],
+      allAppointments: ref([] as Appointment[]),
+      searchedAppointments: ref([] as Appointment[]),
       statusMessage: reactive({ 
         begin: "Existem",
         middle: "0 compromissos",
         end: "agendados",
       }),
       tab: ref(null),
-      noExams: ref(false),
+      noAppointments: ref(false),
       attributes: ref<CalendarAttributes[]>([{
         key: "today",
         highlight: {
@@ -143,8 +143,8 @@ export default defineComponent({
       }]),
       search: ref(''),
       selectedDate: new Date(),
-      showExamDetails: ref(false),
-      selectedExam: ref({} as Exam),
+      showAppointmentDetails: ref(false),
+      selectedAppointment: ref({} as Appointment),
       auth: useAuthStore(),
     }
   },
@@ -160,65 +160,64 @@ export default defineComponent({
       },
     });
     
-    this.allExams = response.data ?? [];
-
-    if(this.allExams.length <= 0) {
+    this.allAppointments = response.data ?? [];
+    if(this.allAppointments.length <= 0) {
       this.loader.endLoading();
-      this.noExams = true;
+      this.noAppointments = true;
       return;
     }
 
-    this.allExams.forEach((exam) => 
+    this.allAppointments.forEach((Appointment) => 
       this.attributes.push({
-        key: exam.titulo,
+        key: Appointment.titulo,
         bar: {
           style: {
             backgroundColor: '#E32585'
           }
         },
-        dates: convertToISODate(exam.data),
+        dates: convertToISODate(Appointment.data),
       })
     );
 
-    this.updateExamsList();
+    this.updateAppointmentsList();
     this.updateText();
 
     this.loader.endLoading();
   },
   methods: {
-    updateExamsList() {
-      this.weekExams = this.allExams.filter((exam) => 
-        this.isDateInThisWeek(convertToISODate(exam.data)) == 0
+    updateAppointmentsList() {
+      this.weekAppointments = this.allAppointments.filter((appointment) => 
+        this.isDateInThisWeek(convertToISODate(appointment.data)) == 0
       );
 
-      this.futureExams = this.allExams.filter(
-        (exam) => this.isDateInThisWeek(convertToISODate(exam.data)) == 1,
+      this.futureAppointments = this.allAppointments.filter(
+        (appointment) => this.isDateInThisWeek(convertToISODate(appointment.data)) == 1,
       );
 
-      if(this.weekExams.length <= 0 && this.futureExams.length <= 0)
-        this.noExams = true;
+      if(this.weekAppointments.length <= 0 && this.futureAppointments.length <= 0)
+        this.noAppointments = true;
     },
-    updateExamsByDay() {
-      let compare = (exam: Exam) => this.compareDate(
-        convertToISODate(exam.data), this.selectedDate
+    updateAppointmentsByDay() {
+      let compare = (appointment: Appointment) => this.compareDate(
+        convertToISODate(appointment.data), this.selectedDate
       );
 
       if(this.search.length > 0)
-        compare = (exam: Exam) => this.compareDate(
-          convertToISODate(exam.data), this.selectedDate
-        ) && exam.titulo.toLowerCase() == this.search.toLowerCase();
+        compare = (appointment: Appointment) => this.compareDate(
+          convertToISODate(appointment.data), this.selectedDate
+        ) && appointment.titulo.toLowerCase() == this.search.toLowerCase();
       
-      this.dayExams = this.allExams.filter(compare);
+      this.dayAppointments = this.allAppointments.filter(compare);
     },
     updateText() {
       this.statusMessage.begin =
-        this.weekExams.length == 1 ? "Existe" : "Existem";
+        this.weekAppointments.length == 1 ? "Existe" : "Existem";
       this.statusMessage.middle =
-        this.weekExams.length == 1
+        this.weekAppointments.length == 1
           ? "1 compromisso"
-          : `${this.weekExams.length} compromissos`;
+          : `${this.weekAppointments.length} compromissos`;
       this.statusMessage.end =
-        this.weekExams.length == 1 ? "agendado" : "agendados";
+        this.weekAppointments.length == 1 ? "agendado" : "agendados";
     },
     isDateInThisWeek(date: Date) {
       const now = moment();
@@ -238,35 +237,35 @@ export default defineComponent({
     },
     onDayClick(selectedDay: CalendarDay) {
       this.selectedDate = selectedDay.date;
-      this.updateExamsByDay();
+      this.updateAppointmentsByDay();
     },
     filterAppointmentListByTitle() {
-      this.updateExamsList();
+      this.updateAppointmentsList();
       this.updateText();
-      this.updateExamsByDay();
+      this.updateAppointmentsByDay();
 
       if(this.search.length <= 0) {
         this.updateText();
         return;
       }
 
-      this.weekExams = this.weekExams.filter(
-        (exam) => exam.titulo.toLowerCase().includes(this.search.toLowerCase())
+      this.weekAppointments = this.weekAppointments.filter(
+        (appointment) => appointment.titulo.toLowerCase().includes(this.search.toLowerCase())
       );
 
-      this.futureExams = this.futureExams.filter(
-        (exam) => exam.titulo.toLowerCase().includes(this.search.toLowerCase())
+      this.futureAppointments = this.futureAppointments.filter(
+        (appointment) => appointment.titulo.toLowerCase().includes(this.search.toLowerCase())
       );
 
-      this.dayExams = this.dayExams.filter(
-        (exam) => exam.titulo.toLowerCase().includes(this.search.toLowerCase())
+      this.dayAppointments = this.dayAppointments.filter(
+        (appointment) => appointment.titulo.toLowerCase().includes(this.search.toLowerCase())
       );
 
       this.updateText();
     },
-    requestDetails(exam: Exam) {
-      this.showExamDetails = !this.showExamDetails;
-      this.selectedExam = exam;
+    requestDetails(appointment: Appointment) {
+      this.showAppointmentDetails = !this.showAppointmentDetails;
+      this.selectedAppointment = appointment;
     }
   },
 });
