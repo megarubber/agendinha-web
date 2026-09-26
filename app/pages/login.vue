@@ -75,6 +75,12 @@ export default defineComponent({
       this.loader.startLoading();
       this.auth.authenticateUserGoogle(
         async (status: number, confirmUser: boolean) => {
+          if(status == 403) {
+            this.toast.error("Este e-mail já foi criado sem o login via Google. Use outro.");
+            this.loader.endLoading();
+            return;
+          }
+          
           if(status != 200) {
             this.toast.error("Erro ao fazer login.");
             this.loader.endLoading();

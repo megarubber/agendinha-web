@@ -18,27 +18,20 @@ const loader = useLoaderStore();
 const toast: any = useNuxtApp().$toast;
 const router = useRouter();
 
-async function confirmAccount(data: string | number) {
-  const { $api } = useNuxtApp();
-  
-  let body: any = {};
-
-  if(isNumber(data)) body = { id_usuario: data };
-  else body = { email: data };
-
-  const response = await $api("/usuarios/confirmar", {
-    method: "POST",
-    body
-  });
-
-  return response;
-}
-
 async function request() {
     loader.startLoading();
-    const response = await confirmAccount(
-        Number(route.params.id || '0')
-    );
+
+    const { $api } = useNuxtApp();
+    const response = await $api("/usuarios/confirmar", {
+        method: "POST",
+        body: { identifier: Number(route.params.id || '0') }
+    });
+
+    if(response.status == 403) {
+        toast.error("Usuário já tem o cadastro confirmado.");
+        loader.endLoading();
+        return;        
+    }
 
     if(response.status != 200) {
         toast.error("Erro ao confirmar e-mail.");

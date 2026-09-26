@@ -70,6 +70,7 @@ export default defineComponent({
 
       const testEmail =
         /^[A-Za-z][A-Za-z0-9._%+-]*@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+      
       if (!testEmail.test(this.user.email)) {
         this.toast.error("E-mail inválido.");
         this.loader.endLoading();
@@ -88,7 +89,7 @@ export default defineComponent({
         return;
       }
       const { $api } = useNuxtApp();
-      
+      this.user.cpf = this.user.cpf.replace(/[^0-9]/g, ''); 
       const response: any = await $api(
         "/usuarios/registrar",
         {
