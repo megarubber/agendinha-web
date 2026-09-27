@@ -20,10 +20,17 @@ export const useAuthStore = defineStore("auth", {
     async refreshAuth() {
       try {
         const { $api } = useNuxtApp();
+        const token = useCookie("token");
         const info: any = await $api(
-          `/usuarios/${this.user.id_usuario}`,
-          { method: "GET" }
+          `/usuarios/${this.user.id_usuario}`, 
+          { 
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token.value}`,
+            },
+          }
         );
+        
         if(info.status != 200) return { status: info.status };
 
         const data = info.data;
