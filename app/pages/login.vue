@@ -16,11 +16,11 @@
           class="font-weight-bold ml-2">Fazer login</v-app-bar-title>
       </template>
     </v-app-bar>
-    <v-main class="d-flex flex-column ga-2">
+    <v-main class="d-flex flex-column ga-2 w-100 align-center">
       <p class="font-weight-bold text-h6 mb-3">Insira seus dados</p>
-      <section>
+      <section class="content">
         <v-text-field 
-          v-model="user.email" 
+          v-model="user.email"
           prepend-inner-icon="mdi-email-outline"
           label="E-mail" />
         <v-text-field
@@ -32,21 +32,15 @@
           @click:append-inner="show = !show"
         />
       </section>
-        <NuxtLink href="/pedido-alteracao-senha" class="font-weight-bold mb-4 text-blue-dark"
+      <NuxtLink href="/pedido-alteracao-senha" class="font-weight-bold mb-4 text-blue-dark"
         >Esqueci minha senha</NuxtLink
       >
-      <v-btn @click="login">Entrar</v-btn>
+      <v-btn @click="login" class="content">Entrar</v-btn>
       <p class="text-center">ou</p>
       <v-btn color="black" width="250" class="align-self-center" variant="outlined" @click="loginWithGoogle">
         <Icon class="mr-4" name="icons:google-logo" size="30" />
         Entrar com o Google
       </v-btn>
-      <div class="text-center mt-6">
-        <p>Ainda não tem uma conta?</p>
-        <NuxtLink href="/registro" class="font-weight-bold mb-6 text-blue-dark">
-          Cadastre-se aqui.
-        </NuxtLink>
-      </div>
     </v-main>
   </v-container>
 </template>
@@ -138,3 +132,9 @@ export default defineComponent({
   },
 });
 </script>
+
+<style scoped>
+.content {
+  min-width: 350px;
+}
+</style>
