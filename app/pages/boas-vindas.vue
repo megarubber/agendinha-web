@@ -3,7 +3,7 @@
     <v-app-bar elevation="0" color="transparent">
       <template #prepend>
         <v-app-bar-nav-icon>
-          <img src="/images/agendinha_logo.png" alt="Logo Agendinha" class="logo" />
+          <img src="/images/agendinha_logo.png" alt="Logo Agendinha" class="logo">
         </v-app-bar-nav-icon>
       </template>
     </v-app-bar>

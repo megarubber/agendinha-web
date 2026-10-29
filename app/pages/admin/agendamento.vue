@@ -1,7 +1,14 @@
 <template>
   <v-container class="h-100 position-fixed">
-    <div class="d-flex flex-column ga-2 pt-4">
-      <p class="font-weight-bold text-h6 mb-1">Novo agendamento</p>
+    <v-app-bar>
+      <template #prepend>
+        <v-app-bar-title
+          class="font-weight-bold ml-2">
+          Novo agendamento
+        </v-app-bar-title>
+      </template>
+    </v-app-bar>
+    <v-main>
       <v-text-field
         v-model="appointmentForm.userId"
         prepend-inner-icon="mdi-identifier"
@@ -41,18 +48,15 @@
       >
         Confirmar agendamento
       </v-btn>
-    </div>
+    </v-main>
   </v-container>
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, onMounted } from "vue";
 import { useAppointments } from "~/composables/useAppointments";
 import { useLoaderStore } from "~/stores/loader";
-import { useAuthStore } from "~/stores/auth";
 
 const loader = useLoaderStore();
-const auth = useAuthStore();
 
 loader.endLoading();
 
@@ -63,14 +67,9 @@ definePageMeta({
 
 const { createAppointment } = useAppointments();
 
-const { $toast, $api } = useNuxtApp();
+const { $toast } = useNuxtApp();
 
 const isSaving = ref(false);
-
-const login = reactive({
-  email: "",
-  password: "",
-});
 
 const appointmentForm = reactive({
   userId: "",
@@ -80,10 +79,6 @@ const appointmentForm = reactive({
   location: "",
   doctor: "",
 });
-
-function logout() {
-  auth.logout();
-}
 
 async function saveAppointment() {
   if (
@@ -107,15 +102,15 @@ async function saveAppointment() {
     const minute = String(date.getMinutes()).padStart(2, "0");
 
     const response: any = await createAppointment({
-      titulo: appointmentForm.title.toUpperCase(),
-      descricao: appointmentForm.description.toUpperCase(),
-      data: `${day}/${month}/${year} ${hour}:${minute}`,
-      local: appointmentForm.location.toUpperCase(),
-      medico: appointmentForm.doctor.toUpperCase(),
-      id_usuario: Number(appointmentForm.userId),
+        titulo: appointmentForm.title.toUpperCase(),
+        descricao: appointmentForm.description.toUpperCase(),
+        data: `${day}/${month}/${year} ${hour}:${minute}`,
+        local: appointmentForm.location.toUpperCase(),
+        medico: appointmentForm.doctor.toUpperCase(),
+        id_usuario: Number(appointmentForm.userId),
     });
 
-    if (response.status === 200) {
+    if (response.status == 200) {
       $toast?.success("Agendamento criado com sucesso!");
 
       appointmentForm.userId = "";

@@ -50,12 +50,12 @@ export default defineComponent({
   },
   data() {
     return {
-      user: {
+      user: ref({
         email: "",
         nome: "",
         senha: "",
         cpf: "",
-      } as UserRegister,
+      } as UserRegister),
       show: false,
       loader: useLoaderStore(),
       toast: useNuxtApp().$toast as any,
@@ -99,8 +99,13 @@ export default defineComponent({
           },
         }
       );
-      if(response.status == 200)
+      if(response.status == 200) {
         this.toast.success("E-mail de cadastro enviado.");
+        this.user.email = '';
+        this.user.nome = '';
+        this.user.senha = '';
+        this.user.cpf = '';
+      }
       else this.toast.error("Erro ao fazer o cadastro.");
 
       this.loader.endLoading();

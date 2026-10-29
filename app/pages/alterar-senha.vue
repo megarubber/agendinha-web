@@ -55,7 +55,7 @@ import { useLoaderStore } from "~/stores/loader";
 export default defineComponent({
   name: "UpdatePassword",
   setup() {
-    definePageMeta({ middleware: "auth" });
+    definePageMeta({ requiresRole: "ROLE_USER" });
   },
   data() {
     return {
