@@ -1,24 +1,28 @@
 import { useAuthStore } from "~/stores/auth";
+import { useLoaderStore } from "~/stores/loader";
 
 export default defineNuxtRouteMiddleware(async (to) => {
   const auth = useAuthStore();
+  const loader = useLoaderStore();
   const token = useCookie("token");
-  const { user, authenticated } = storeToRefs(auth);
+  const { user } = storeToRefs(auth);
 
   if (token.value) {
+    loader.startLoading();
     await auth.refreshAuth();
+    loader.endLoading();
     return;
   }
 
-  if (!token.value) {
+  const requiredRole = to.meta.requiresRole as string | string[] | undefined;
+
+  if (!token.value && requiredRole) {
     const firstTime = useCookie("firsttime");
     const target = firstTime.value === "false" ? "/login" : "/boas-vindas";
 
     if (to.path !== target) return navigateTo(target);
     return;
   }
-
-  const requiredRole = to.meta.requiresRole as string | string[] | undefined;
 
   if (requiredRole) {
     if (!user.value.id_usuario) {

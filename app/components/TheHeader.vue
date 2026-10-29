@@ -1,6 +1,32 @@
 <template>
   <v-container class="fix-header pa-0 position-fixed bottom-0 bg-white d-flex justify-center">
-    <v-tabs v-if="auth.user.role == 'ROLE_USER'" v-model="currentTab" @click="changePage">
+    <v-tabs v-if="auth.user.role == 'ROLE_ADMIN'" v-model="currentTab" @click="changePage">
+      <v-tab value="/admin">
+        <div class="custom-tab">
+          <v-icon size="24" icon="mdi-home-outline" />
+          <p>Menu</p>
+        </div>
+      </v-tab>
+      <v-tab value="/admin/agendamento">
+        <div class="custom-tab">
+          <v-icon icon="mdi-calendar-outline" size="24" />
+          <p>Agendamentos</p>
+        </div>
+      </v-tab>
+      <v-tab value="/admin/notificacao">
+        <div class="custom-tab">
+          <v-icon icon="mdi-bell-outline" size="24" />
+          <p>Notificações</p>
+        </div>
+      </v-tab>
+      <v-tab value="/admin/usuario">
+        <div class="custom-tab">
+          <v-icon icon="mdi-account-outline" size="24" />
+          <p>Usuários</p>
+        </div>
+      </v-tab>
+    </v-tabs>
+    <v-tabs v-else v-model="currentTab" @click="changePage">
       <v-tab value="/">
         <div class="custom-tab">
           <v-icon size="24" icon="mdi-home-outline" />
@@ -37,32 +63,6 @@
         <div class="custom-tab">
           <v-icon icon="mdi-account-outline" size="24" />
           <p>Perfil</p>
-        </div>
-      </v-tab>
-    </v-tabs>
-    <v-tabs v-model="currentTab" v-else @click="changePage">
-      <v-tab value="/admin">
-        <div class="custom-tab">
-          <v-icon size="24" icon="mdi-home-outline" />
-          <p>Menu</p>
-        </div>
-      </v-tab>
-      <v-tab value="/admin/agendamento">
-        <div class="custom-tab">
-          <v-icon icon="mdi-phone-outline" size="24" />
-          <p>Agendamentos</p>
-        </div>
-      </v-tab>
-      <v-tab value="/admin/notificacao">
-        <div class="custom-tab">
-          <v-icon icon="mdi-bell-outline" size="24" />
-          <p>Notificações</p>
-        </div>
-      </v-tab>
-      <v-tab value="/admin/usuario">
-        <div class="custom-tab">
-          <v-icon icon="mdi-account-outline" size="24" />
-          <p>Usuários</p>
         </div>
       </v-tab>
     </v-tabs>
