@@ -6,25 +6,27 @@
           class="font-weight-bold ml-2">Alterar senha</v-app-bar-title>
       </template>
     </v-app-bar>
-    <v-main>
-      <v-text-field
-        v-model="password" 
-        label="Nova Senha"
-        :type="showPassword ? 'text' : 'password'"
-        :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-        @click:append-inner="showPassword = !showPassword"
-        />
-      <v-text-field
-        v-model="confirmPassword" 
-        label="Confirmar Senha"
-        :type="showConfirmPassword ? 'text' : 'password'"
-        :append-inner-icon="showConfirmPassword ? 'mdi-eye' : 'mdi-eye-off'"
-        @click:append-inner="showConfirmPassword = !showConfirmPassword"
-        />
-      <v-btn 
-        class="w-100"
-        @click="updatePassword"
-        >Alterar Senha</v-btn>
+    <v-main class="d-flex flex-column ga-2 w-100 align-center">
+      <v-content class="content">
+        <v-text-field
+          v-model="password" 
+          label="Nova Senha"
+          :type="showPassword ? 'text' : 'password'"
+          :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+          @click:append-inner="showPassword = !showPassword"
+          />
+        <v-text-field
+          v-model="confirmPassword" 
+          label="Confirmar Senha"
+          :type="showConfirmPassword ? 'text' : 'password'"
+          :append-inner-icon="showConfirmPassword ? 'mdi-eye' : 'mdi-eye-off'"
+          @click:append-inner="showConfirmPassword = !showConfirmPassword"
+          />
+        <v-btn 
+          class="w-100"
+          @click="updatePassword"
+          >Alterar Senha</v-btn>
+      </v-content>
     </v-main>
   </v-container>
 </template>
@@ -77,3 +79,9 @@ async function updatePassword() {
   loader.endLoading();
 }
 </script>
+
+<style scoped>
+.content {
+  min-width: 350px;
+}
+</style>

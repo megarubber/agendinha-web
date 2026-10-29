@@ -56,7 +56,6 @@ import { useAuthStore } from "~/stores/auth";
 import { storeToRefs } from "pinia";
 const config = useRuntimeConfig();
 const showDelete = ref(false);
-
 definePageMeta({ requiresRole: 'ROLE_USER', showHeader: true });
 const auth = useAuthStore();
 const { user } = storeToRefs(auth);
