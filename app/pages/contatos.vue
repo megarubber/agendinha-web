@@ -55,7 +55,6 @@ import openMap from '~/utils/openMap';
 import copyToClipboard from '~/utils/copyToClipboard';
 
 definePageMeta({ 
-  middleware: "auth", 
   showHeader: true,
   requiresRole: "ROLE_USER"
 });

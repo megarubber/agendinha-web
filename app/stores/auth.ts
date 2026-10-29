@@ -5,6 +5,8 @@ import type GoogleTokens from "~~/shared/types/googleTokens";
 import type UserGoogleAuth from "~~/shared/types/userGoogleAuth";
 import { googleSdkLoaded } from "vue3-google-login";
 import type { User } from "~~/shared/types/user";
+import { useLoaderStore } from "~/stores/loader";
+
 type Callback = (status: number, data: any) => void;
 
 export const useAuthStore = defineStore("auth", {
@@ -18,11 +20,12 @@ export const useAuthStore = defineStore("auth", {
   }),
   actions: {
     async refreshAuth() {
+      const loader = useLoaderStore();
+      loader.startLoading();
       try {
         const { $api } = useNuxtApp();
         const token = useCookie("token");
-        const info: any = await $api(
-          `/usuarios/${this.user.id_usuario}`, 
+        const info: any = await $api('/usuarios', 
           { 
             method: "GET",
             headers: {
@@ -37,8 +40,7 @@ export const useAuthStore = defineStore("auth", {
         if(!data.usuario.cadastro_confirmado) return { status: 403 };
 
         this.notifications = data.notificacoes;
-        Object.assign(this.user, data.usuario);
-
+        this.user = data.usuario;
         this.authenticated = true;
 
         const notReadNotifications: Notification[] = this.notifications.filter(
@@ -46,8 +48,10 @@ export const useAuthStore = defineStore("auth", {
         );
 
         this.notReadNotifications = notReadNotifications.length;
+        loader.endLoading();
       } catch(error: any) {
-        console.error(error.status);
+        loader.endLoading();
+        console.error("refreshAuth failed:", error?.statusCode, error?.message, error?.data);
         return { status: error.status };
       }
       return { status: 200 };

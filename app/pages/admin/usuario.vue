@@ -42,7 +42,12 @@ import type UserRegister from "~~/shared/types/userRegister";
 import { useAuthStore } from "~/stores/auth";
 
 export default defineComponent({
-  name: "Usuario",
+  setup() {
+    definePageMeta({ 
+      showHeader: true,
+      requiresRole: "ROLE_ADMIN"
+    });
+  },
   data() {
     return {
       user: {
@@ -56,12 +61,6 @@ export default defineComponent({
       toast: useNuxtApp().$toast as any,
       auth: useAuthStore(),
     };
-  },
-  setup() {
-    definePageMeta({ 
-        showHeader: true,
-        requiresRole: "ROLE_ADMIN"
-    });
   },
   methods: {
     async register() {

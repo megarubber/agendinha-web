@@ -104,7 +104,7 @@ export default defineComponent({
         return;        
       }
 
-      const status = await this.auth.authenticateUser(this.user);
+      const { status, data } = await this.auth.authenticateUser(this.user);
 
       if (status == 200) {
         if(this.auth.user.role == "ROLE_ADMIN") this.$router.push("/admin");
@@ -115,7 +115,7 @@ export default defineComponent({
       }
 
       if (status == 401 || status == 400) {
-        this.toast.error("E-mail/senha não encontrado.");
+        this.toast.error(data.error);
         this.loader.endLoading();
         return;
       }
