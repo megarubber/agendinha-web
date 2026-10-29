@@ -95,14 +95,16 @@ export const useAuthStore = defineStore("auth", {
               });
     
               responseCode = login.status;
-              const loginData = login.data;
+              const data = login.data;
     
               const token = useCookie("token");
-              token.value = loginData.token;
+              token.value = data.token;
     
-              this.accessToken = loginData.google_access_token ?? null;
+              this.user = data.usuario;
+              this.notifications = data.notificacoes;
+              this.accessToken = data.google_access_token ?? null;
     
-              endRequest(responseCode, { data: loginData });
+              endRequest(responseCode, { data });
             } catch (err: any) {
               endRequest(err?.statusCode ?? err?.status ?? 500, {
                 data: { message: err?.data?.message ?? 'Erro ao autenticar com o Google' },

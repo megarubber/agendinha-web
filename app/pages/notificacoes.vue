@@ -58,7 +58,7 @@ import { useAuthStore } from "~/stores/auth";
 export default defineComponent({
   name: "Notifications",
   setup() {
-    definePageMeta({ middleware: "auth", showHeader: true });
+    definePageMeta({ requiresRole: "ROLE_USER", showHeader: true });
   },
   data() {
     return {

@@ -79,10 +79,11 @@ export default defineComponent({
             this.loader.endLoading();
             return;
           }
-          console.log(this.auth.user.role);
+
           this.loader.endLoading();
           if(this.auth.user.role == "ROLE_ADMIN") this.$router.push("/admin");
           else this.$router.push("/");
+
           const permission = await Notification.requestPermission();
           if(permission == 'granted') await usePush(this.auth.user.id_usuario);
         }
