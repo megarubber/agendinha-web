@@ -1,136 +1,58 @@
 <template>
-  <v-container class="d-flex ga-2 flex-column pb-16">
-    <div class="d-flex flex-column ga-2 pt-4">
-      <p class="font-weight-bold text-h6 mb-1">Novo agendamento</p>
-      <v-text-field
-        v-model="appointmentForm.userId"
-        prepend-inner-icon="mdi-identifier"
-        label="ID do paciente"
-        type="number"
+  <v-container class="h-100 position-fixed">
+    <v-app-bar>
+      <template #prepend>
+        <v-app-bar-title
+          class="font-weight-bold ml-2">
+          Menu
+        </v-app-bar-title>
+      </template>
+    </v-app-bar>
+    <v-main class="text-center d-flex h-100 justify-space-between flex-column">
+        <client-only>
+          <h3 style="color: #4b4b4b">Bem-vindo(a) de volta, {{ auth.user.nome }}</h3>
+        </client-only>
+      <section class="d-flex flex-column ga-10">
+        <v-btn
+          class="w-100"
+          color="#F8F8F8"
+          text="Desconectar"
+          prepend-icon="mdi-exit-to-app"
+          to="/login"
+          @click="logUserOut"
+        />
+        <p class="text-primary mb-14 cursor-pointer" @click="requestDelete">
+          Excluir Conta
+        </p>
+      </section>
+    </v-main>
+    <div v-if="showDelete">
+      <delete-account 
+        :show="showDelete"
+        :user-id="user.id_usuario"
+        @close="requestDelete"
       />
-      <v-text-field
-        v-model="appointmentForm.title"
-        prepend-inner-icon="mdi-text-short"
-        label="Título"
-      />
-      <v-text-field
-        v-model="appointmentForm.description"
-        prepend-inner-icon="mdi-text"
-        label="Descrição"
-      />
-      <v-text-field
-        v-model="appointmentForm.date"
-        prepend-inner-icon="mdi-calendar-clock-outline"
-        label="Data e hora"
-        type="datetime-local"
-      />
-      <v-text-field
-        v-model="appointmentForm.location"
-        prepend-inner-icon="mdi-map-marker-outline"
-        label="Local"
-      />
-      <v-text-field
-        v-model="appointmentForm.doctor"
-        prepend-inner-icon="mdi-stethoscope"
-        label="Médico responsável"
-      />
-      <v-btn
-        class="w-100"
-        :loading="isSaving"
-        @click="saveAppointment"
-      >
-        Confirmar agendamento
-      </v-btn>
     </div>
   </v-container>
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, onMounted } from "vue";
-import { useAppointments } from "~/composables/useAppointments";
-import { useLoaderStore } from "~/stores/loader";
 import { useAuthStore } from "~/stores/auth";
 
-const loader = useLoaderStore();
 const auth = useAuthStore();
+const { user } = storeToRefs(auth);
+const showDelete = ref(false);
 
-loader.endLoading();
-
-definePageMeta({
-  middleware: "auth",
+definePageMeta({ 
+  showHeader: true,
   requiresRole: "ROLE_ADMIN"
 });
 
-const { createAppointment } = useAppointments();
-
-const { $toast, $api } = useNuxtApp();
-
-const isSaving = ref(false);
-
-const login = reactive({
-  email: "",
-  password: "",
-});
-
-const appointmentForm = reactive({
-  userId: "",
-  title: "",
-  description: "",
-  date: "",
-  location: "",
-  doctor: "",
-});
-
-function logout() {
+function logUserOut(): void {
   auth.logout();
 }
 
-async function saveAppointment() {
-  if (
-    !appointmentForm.userId ||
-    !appointmentForm.title ||
-    !appointmentForm.date
-  ) {
-    $toast?.error("Preencha ID do paciente, título e data.");
-    return;
-  }
-
-  isSaving.value = true;
-
-  try {
-    const date = new Date(appointmentForm.date);
-
-    const day = String(date.getDate()).padStart(2, "0");
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const year = date.getFullYear();
-    const hour = String(date.getHours()).padStart(2, "0");
-    const minute = String(date.getMinutes()).padStart(2, "0");
-
-    const response: any = await createAppointment({
-      titulo: appointmentForm.title.toUpperCase(),
-      descricao: appointmentForm.description.toUpperCase(),
-      data: `${day}/${month}/${year} ${hour}:${minute}`,
-      local: appointmentForm.location.toUpperCase(),
-      medico: appointmentForm.doctor.toUpperCase(),
-      id_usuario: Number(appointmentForm.userId),
-    });
-
-    if (response.status === 200) {
-      $toast?.success("Agendamento criado com sucesso!");
-
-      appointmentForm.userId = "";
-      appointmentForm.title = "";
-      appointmentForm.description = "";
-      appointmentForm.date = "";
-      appointmentForm.location = "";
-      appointmentForm.doctor = "";
-    } else {
-      $toast?.error("Erro ao criar agendamento.");
-    }
-  } catch {
-    $toast?.error("Erro ao criar agendamento.");
-  } finally {
-    isSaving.value = false;
-  }
+function requestDelete(): void {
+  showDelete.value = !showDelete.value;
 }
 </script>

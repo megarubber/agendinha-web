@@ -3,12 +3,11 @@ import { useAuthStore } from "~/stores/auth";
 export default defineNuxtRouteMiddleware(async (to) => {
   const auth = useAuthStore();
   const token = useCookie("token");
+  const { user, authenticated } = storeToRefs(auth);
 
   if (token.value) {
-    const { authenticated } = storeToRefs(auth);
-    authenticated.value = true;
-
     await auth.refreshAuth();
+    return;
   }
 
   if (!token.value) {
@@ -22,10 +21,11 @@ export default defineNuxtRouteMiddleware(async (to) => {
   const requiredRole = to.meta.requiresRole as string | string[] | undefined;
 
   if (requiredRole) {
-    const { user } = storeToRefs(auth);
+    if (!user.value.id_usuario) {
+      const firstTime = useCookie("firsttime");
+      const target = firstTime.value === "false" ? "/login" : "/boas-vindas";
 
-    if (!user.value) {
-      if (to.path !== "/login") return navigateTo("/login");
+      if (to.path !== target) return navigateTo(target);
       return;
     }
 

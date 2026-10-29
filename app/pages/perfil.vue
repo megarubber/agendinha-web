@@ -57,7 +57,7 @@ import { storeToRefs } from "pinia";
 const config = useRuntimeConfig();
 const showDelete = ref(false);
 
-definePageMeta({ middleware: "auth", showHeader: true });
+definePageMeta({ requiresRole: 'ROLE_USER', showHeader: true });
 const auth = useAuthStore();
 const { user } = storeToRefs(auth);
 const profileImageURL: Ref<string | string> = ref('');

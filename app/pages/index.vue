@@ -113,7 +113,6 @@ export default defineComponent({
   name: "Home",
   setup() {
     definePageMeta({ 
-      middleware: "auth", 
       showHeader: true,
       requiresRole: "ROLE_USER"
     });
