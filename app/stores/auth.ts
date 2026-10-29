@@ -20,8 +20,6 @@ export const useAuthStore = defineStore("auth", {
   }),
   actions: {
     async refreshAuth() {
-      const loader = useLoaderStore();
-      loader.startLoading();
       try {
         const { $api } = useNuxtApp();
         const token = useCookie("token");
@@ -48,9 +46,7 @@ export const useAuthStore = defineStore("auth", {
         );
 
         this.notReadNotifications = notReadNotifications.length;
-        loader.endLoading();
       } catch(error: any) {
-        loader.endLoading();
         console.error("refreshAuth failed:", error?.statusCode, error?.message, error?.data);
         return { status: error.status };
       }
@@ -76,6 +72,7 @@ export const useAuthStore = defineStore("auth", {
     async authenticateUserGoogle(endRequest: Callback) {
       const config = useRuntimeConfig();
       const { $api } = useNuxtApp();
+      const loader = useLoaderStore();
       
       googleSdkLoaded((google) => {
         google.accounts.oauth2.initCodeClient({
@@ -83,6 +80,7 @@ export const useAuthStore = defineStore("auth", {
           scope: 'email profile openid',
           callback: async (response: any) => {
             let responseCode;
+            loader.startLoading();
 
             const tokens: any = await $fetch(
               "https://oauth2.googleapis.com/token",
@@ -100,7 +98,8 @@ export const useAuthStore = defineStore("auth", {
                     
             if(!tokens.access_token || !tokens.id_token) {
               responseCode = 400;
-              endRequest(responseCode, {});
+              endRequest(responseCode, { data: response.data });
+              loader.endLoading();
               return;
             }
 
@@ -115,7 +114,8 @@ export const useAuthStore = defineStore("auth", {
 
             if(!info.email) {
               responseCode = 400;
-              endRequest(responseCode, {});
+              endRequest(responseCode, { data: response.data });
+              loader.endLoading();
               return;
             }
             
@@ -130,25 +130,19 @@ export const useAuthStore = defineStore("auth", {
             });
 
             responseCode = login.status;
-
             const loginData = login.data;
-
-            endRequest(responseCode, {
-              tokens,
-              loginRequest: loginData 
-            });
 
             const token = useCookie("token");
             token.value = loginData.token;
 
-            this.user = loginData.usuario;
-            this.googleTokens = tokens;
-            
-            if(!this.user.cadastro_confirmado) endRequest(responseCode, false);
-            else {
-              this.notifications = loginData.notificacoes;
-              endRequest(responseCode, true);
-            }
+            endRequest(responseCode, {
+              data: {
+                login: loginData,
+                google: tokens,
+              }
+            });
+
+            loader.endLoading();
           }
         }).requestCode();
       });
@@ -156,6 +150,7 @@ export const useAuthStore = defineStore("auth", {
     logout() {
       const token = useCookie("token");
       this.authenticated = false;
+      this.user = {} as User;
       token.value = null;
     },
   },

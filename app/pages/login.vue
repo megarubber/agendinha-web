@@ -66,9 +66,8 @@ export default defineComponent({
   },
   methods: {
     loginWithGoogle() {
-      this.loader.startLoading();
       this.auth.authenticateUserGoogle(
-        async (status: number, confirmUser: boolean) => {
+        async (status: number, data: any) => {
           if(status == 403) {
             this.toast.error("Este e-mail já foi criado sem o login via Google. Use outro.");
             this.loader.endLoading();
@@ -76,16 +75,16 @@ export default defineComponent({
           }
           
           if(status != 200) {
-            this.toast.error("Erro ao fazer login.");
+            this.toast.error(data.login.message);
             this.loader.endLoading();
             return;
           }
-          
+          console.log(this.auth.user.role);
+          this.loader.endLoading();
+          if(this.auth.user.role == "ROLE_ADMIN") this.$router.push("/admin");
+          else this.$router.push("/");
           const permission = await Notification.requestPermission();
           if(permission == 'granted') await usePush(this.auth.user.id_usuario);
-
-          this.$router.push(confirmUser ? "/" : "/completar-informacoes");
-          this.loader.endLoading();
         }
       );
     },
@@ -107,6 +106,7 @@ export default defineComponent({
       const { status, data } = await this.auth.authenticateUser(this.user);
 
       if (status == 200) {
+        this.loader.endLoading();
         if(this.auth.user.role == "ROLE_ADMIN") this.$router.push("/admin");
         else this.$router.push("/");
         const permission = await Notification.requestPermission();
