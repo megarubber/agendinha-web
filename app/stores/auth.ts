@@ -71,7 +71,7 @@ export const useAuthStore = defineStore("auth", {
         this.notifications = data.notificacoes;
       }
       
-      return response.status;
+      return { status: response.status, data: response.data };
     },
     async authenticateUserGoogle(endRequest: Callback) {
       const config = useRuntimeConfig();
