@@ -1,8 +1,6 @@
 import type UserToken from "~~/shared/types/userToken";
 import type UserAuth from "~~/shared/types/userAuth";
 import type Notification from "~~/shared/types/notification";
-import type GoogleTokens from "~~/shared/types/googleTokens";
-import type UserGoogleAuth from "~~/shared/types/userGoogleAuth";
 import { googleSdkLoaded } from "vue3-google-login";
 import type { User } from "~~/shared/types/user";
 import { useLoaderStore } from "~/stores/loader";
@@ -16,7 +14,7 @@ export const useAuthStore = defineStore("auth", {
     notifications: [] as Notification[],
     notReadNotifications: 0, 
     page: '/',
-    googleTokens: {} as GoogleTokens,
+    accessToken: '' as string,
   }),
   actions: {
     async refreshAuth() {
@@ -73,77 +71,49 @@ export const useAuthStore = defineStore("auth", {
       const config = useRuntimeConfig();
       const { $api } = useNuxtApp();
       const loader = useLoaderStore();
-      
+    
       googleSdkLoaded((google) => {
         google.accounts.oauth2.initCodeClient({
           client_id: config.public.googleClientId,
-          scope: 'email profile openid',
+          scope: 'email profile openid https://www.googleapis.com/auth/calendar.events',
+          ux_mode: 'popup',
           callback: async (response: any) => {
+            if (response.error || !response.code) {
+              endRequest(400, { data: { message: 'Login com Google cancelado' } });
+              return;
+            }
+    
             let responseCode;
             loader.startLoading();
-
-            const tokens: any = await $fetch(
-              "https://oauth2.googleapis.com/token",
-              {
+    
+            try {
+              const login: any = await $api('/usuarios/login/google', {
                 method: "POST",
-                body: JSON.stringify({
+                body: {
                   code: response.code,
-                  client_id: config.public.googleClientId,
-                  client_secret: config.public.googleClientSecret,
-                  redirect_uri: "postmessage",
-                  grant_type: "authorization_code",
-                }),
-              },
-            );
-                    
-            if(!tokens.access_token || !tokens.id_token) {
-              responseCode = 400;
-              endRequest(responseCode, { data: response.data });
-              loader.endLoading();
-              return;
-            }
-
-            const info: any = await $fetch(
-              "https://www.googleapis.com/oauth2/v3/userinfo",
-              {
-                headers: {
-                  Authorization: `Bearer ${tokens.access_token}`,
                 },
-              },
-            );
-
-            if(!info.email) {
-              responseCode = 400;
-              endRequest(responseCode, { data: response.data });
+              });
+    
+              responseCode = login.status;
+              const loginData = login.data;
+    
+              const token = useCookie("token");
+              token.value = loginData.token;
+    
+              this.accessToken = loginData.google_access_token ?? null;
+    
+              endRequest(responseCode, { data: loginData });
+            } catch (err: any) {
+              endRequest(err?.statusCode ?? err?.status ?? 500, {
+                data: { message: err?.data?.message ?? 'Erro ao autenticar com o Google' },
+              });
+            } finally {
               loader.endLoading();
-              return;
             }
-            
-            const auth: UserGoogleAuth = {
-              token: tokens.id_token as string,
-              email: info.email as string
-            }
-
-            const login: any = await $api('/usuarios/login/google', {
-              method: "POST",
-              body: auth,
-            });
-
-            responseCode = login.status;
-            const loginData = login.data;
-
-            const token = useCookie("token");
-            token.value = loginData.token;
-
-            endRequest(responseCode, {
-              data: {
-                login: loginData,
-                google: tokens,
-              }
-            });
-
-            loader.endLoading();
-          }
+          },
+          error_callback: () => {
+            endRequest(400, { data: { message: 'Não foi possível abrir o login do Google' } });
+          },
         }).requestCode();
       });
     },

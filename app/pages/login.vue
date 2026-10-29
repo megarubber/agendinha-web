@@ -35,7 +35,7 @@
       <NuxtLink href="/pedido-alteracao-senha" class="font-weight-bold mb-4 text-blue-dark"
         >Esqueci minha senha</NuxtLink
       >
-      <v-btn @click="login" class="content">Entrar</v-btn>
+      <v-btn class="content" @click="login">Entrar</v-btn>
       <p class="text-center">ou</p>
       <v-btn color="black" width="250" class="align-self-center" variant="outlined" @click="loginWithGoogle">
         <Icon class="mr-4" name="icons:google-logo" size="30" />
@@ -75,7 +75,7 @@ export default defineComponent({
           }
           
           if(status != 200) {
-            this.toast.error(data.login.message);
+            this.toast.error(data.message);
             this.loader.endLoading();
             return;
           }

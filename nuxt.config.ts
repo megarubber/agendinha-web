@@ -52,7 +52,6 @@ export default defineNuxtConfig({
     public: {
       apiBase: process.env.NUXT_PUBLIC_API_BASE || "http://localhost:8080/",
       googleClientId: process.env.NUXT_GOOGLE_CLIENT_ID,
-      googleClientSecret: process.env.NUXT_GOOGLE_CLIENT_SECRET,
       vapidPublicKey: process.env.NUXT_VAPID_PUBLIC_KEY,
       vapidPrivateKey: process.env.NUXT_VAPID_PRIVATE_KEY
     },

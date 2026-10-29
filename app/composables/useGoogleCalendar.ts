@@ -1,4 +1,4 @@
-import type Exam from "~~/shared/types/appointment";
+import type Appointment from "~~/shared/types/appointment";
 import { useAuthStore } from "~/stores/auth";
 
 export function useGoogleCalendar() {
@@ -6,14 +6,14 @@ export function useGoogleCalendar() {
     const token = useCookie("token");
     const { googleTokens } = storeToRefs(useAuthStore());
 
-    async function createTaskIntoCalendar(exam: Exam) {
+    async function createTaskIntoCalendar(appointment: Appointment) {
         return await $fetch(`${config.public.apiBase}/agendamentos/google`, {
             method: "POST",
             headers: {
                 Authorization: `Bearer ${token.value}`,
             },
             body: {
-                exam,
+                appointment,
                 tokens: googleTokens.value,
             },
         });

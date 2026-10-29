@@ -93,7 +93,7 @@
         :local="selectedAppointment.local"
         :lembrete_enviado="selectedAppointment.lembrete_enviado"
         :show="showAppointmentDetails"
-        :modo_google="auth.googleTokens.access_token != undefined"
+        :modo_google="auth.accessToken != undefined"
         @close="showAppointmentDetails = !showAppointmentDetails"
       />
     </div>

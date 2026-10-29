@@ -13,12 +13,12 @@
       color="#E6F6FE"
       rounded="xl"
       class="card mb-2"
-      :subtitle="formatDate(convertToISODate(appointment.data)).weekday + ' - ' + appointment.titulo"
+      :subtitle="formatDate(convertToISODate(appointment.data)).weekday + ' - ' + appointment.nome_paciente"
       :text="appointment.local"
     >
       <template #title>
         <span class="font-weight-bold text-wrap">
-          {{ appointment.nome_paciente || 'Paciente Desconhecido' }}
+          {{ appointment.titulo }}
         </span>
       </template>
       <template #append>
