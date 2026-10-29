@@ -1,5 +1,5 @@
 <template>
-  <v-container class="d-flex ga-2 flex-column">
+  <v-container class="h-100 position-fixed">
     <v-app-bar>
       <template #prepend>
         <v-app-bar-title

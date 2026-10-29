@@ -9,8 +9,8 @@
       </template>
     </v-app-bar>
     <v-main class="text-center d-flex h-100 justify-space-between flex-column">
-        <client-only>
-          <h3 style="color: #4b4b4b">Bem-vindo(a) de volta, {{ auth.user.nome }}</h3>
+      <client-only>
+        <h3 style="color: #4b4b4b">Bem-vindo(a) de volta, {{ auth.user.nome }}</h3>
         </client-only>
       <section class="d-flex flex-column ga-10">
         <v-btn

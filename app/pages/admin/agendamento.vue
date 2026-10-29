@@ -1,5 +1,5 @@
 <template>
-  <v-container class="d-flex ga-2 flex-column pb-16">
+  <v-container class="h-100 position-fixed">
     <div class="d-flex flex-column ga-2 pt-4">
       <p class="font-weight-bold text-h6 mb-1">Novo agendamento</p>
       <v-text-field
