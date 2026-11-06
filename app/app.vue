@@ -23,7 +23,7 @@ useSeoMeta({
 </script>
 
 <style>
-.appointment-sheet.v-overlay__content {
+.generic-card.v-overlay__content {
   background: transparent !important;
   box-shadow: none !important;
 }

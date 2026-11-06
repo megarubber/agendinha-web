@@ -19,11 +19,11 @@
 </template>
 
 <script lang="ts" setup>
-import type NotificationType from "~~/shared/types/notification";
+import type Notification from "~~/shared/types/notification";
 
 const props = defineProps({
   notifications: {
-    type: Array as PropType<NotificationType[]>,
+    type: Array as PropType<Notification[]>,
     required: true,
   },
   color: {
@@ -33,7 +33,7 @@ const props = defineProps({
 });
 defineEmits(['requestDetails']);
 
-const allNotifications = ref([] as NotificationType[]);
+const allNotifications = ref([] as Notification[]);
 allNotifications.value = props.notifications;
 
 watch(
@@ -44,11 +44,13 @@ watch(
   }
 );
 
-
 const realColor = ref('');
 realColor.value = props.color;
 
-function formatDate(eventDate: string) {
-  return eventDate.substring(0, 5);
+function formatDate(isoString: string): string {
+  const date = new Date(isoString);
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  return `${day}/${month}`;
 }
 </script>

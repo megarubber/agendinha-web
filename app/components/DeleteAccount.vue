@@ -2,8 +2,9 @@
     <v-bottom-sheet
         v-model="status"
         height="75%"
+        content-class="generic-card"
     >
-        <v-card class="rounded-xl">
+        <v-card class="rounded-t-xl rounded-b-0">
             <template #append>
                 <v-avatar
                 color="#BCD4FF"

@@ -2,7 +2,7 @@
     <v-bottom-sheet
         v-model="status"
         height="75%"
-        content-class="appointment-sheet"
+        content-class="generic-card"
     >
         <v-card class="rounded-t-xl rounded-b-0">
             <template #append>
@@ -49,7 +49,7 @@
                     <strong>Data/Horário:</strong> {{ props.data }}
                 </v-card-text>
                 <v-card-text class="py-1">
-                    <strong>Médico:</strong> {{ props.medico }}
+                    <strong>Responsável:</strong> {{ props.medico }}
                 </v-card-text>
                 <v-card-text class="pt-1">
                     <strong>Local:</strong> {{ props.local }}
@@ -96,7 +96,7 @@ async function moveToGoogleCalendar() {
   const event = {
     summary: props.titulo,
     location: props.local,
-    description: `${props.descricao}, Médico: ${props.medico}`,
+    description: `${props.descricao}, Responsável: ${props.medico}`,
     start: { dateTime: start.toISOString(), timeZone: 'America/Sao_Paulo' },
     end: { dateTime: end.toISOString(), timeZone: 'America/Sao_Paulo' },
     colorId: '6',
