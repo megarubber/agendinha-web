@@ -122,6 +122,7 @@ export const useAuthStore = defineStore("auth", {
       this.authenticated = false;
       this.user = {} as User;
       token.value = null;
+      this.accessToken = '';
     },
   },
 });

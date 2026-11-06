@@ -97,7 +97,7 @@
         :nome_paciente="selectedAppointment.nome_paciente"
         :lembrete_enviado="selectedAppointment.lembrete_enviado"
         :show="showAppointmentDetails"
-        :modo_google="auth.accessToken != undefined"
+        :modo_google="auth.accessToken != undefined && auth.accessToken != ''"
         @close="showAppointmentDetails = !showAppointmentDetails"
       />
     </div>

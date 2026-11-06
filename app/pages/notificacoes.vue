@@ -9,26 +9,22 @@
       </template>
     </v-app-bar>
     <v-main class="d-flex flex-column ga-4 mx-3 mt-3">
-      <section v-if="readNotifications.length > 0 || notReadNotifications.length > 0">
+      <section v-if="readNotifications.length > 0 || notReadNotifications.length > 0" class="scroll">
         <section v-if="notReadNotifications.length > 0">
-          <section class="scroll">
-            <p class="mb-4">Não Lidas</p>
-            <NotificationGenerator 
-            :notifications="notReadNotifications" 
-            color="blue-light" 
-            @request-details="(notification: NotificationType) => requestDetails(notification)"
-            />
-          </section>
-        </section> 
+          <p class="mb-4">Não Lidas</p>
+          <NotificationGenerator
+            :notifications="notReadNotifications"
+            color="blue-light"
+            @request-details="(notification: Notification) => requestDetails(notification)"
+          />
+        </section>
         <section v-if="readNotifications.length > 0">
-          <section class="scroll">
-            <p>Lidas</p>
-            <NotificationGenerator 
-            :notifications="readNotifications" 
-            color="#F8F8F8" 
-            @request-details="(notification: NotificationType) => requestDetails(notification)"
-            />
-          </section>
+          <p class="mt-4 mb-4">Lidas</p>
+          <NotificationGenerator
+            :notifications="readNotifications"
+            color="#F8F8F8"
+            @request-details="(notification: Notification) => requestDetails(notification)"
+          />
         </section>
       </section>
       <section v-else>
@@ -51,7 +47,7 @@
 </template>
 
 <script lang="ts">
-import type NotificationType from "~~/shared/types/notification";
+import type Notification from "~~/shared/types/notification";
 import { useLoaderStore } from "~/stores/loader";
 import { useAuthStore } from "~/stores/auth";
 
@@ -62,12 +58,12 @@ export default defineComponent({
   },
   data() {
     return {
-      readNotifications: ref([] as NotificationType[]),
-      notReadNotifications: ref([] as NotificationType[]),
+      readNotifications: ref([] as Notification[]),
+      notReadNotifications: ref([] as Notification[]),
       loader: useLoaderStore(),
       auth: storeToRefs(useAuthStore()),
       showNotificationDetails: ref(false),
-      selectedNotification: ref({} as NotificationType)
+      selectedNotification: ref({} as Notification)
     };
   },
   async mounted() {
@@ -88,7 +84,7 @@ export default defineComponent({
 
       this.auth.notReadNotifications = this.notReadNotifications.length;
     },
-    requestDetails(notification: NotificationType) {
+    requestDetails(notification: Notification) {
       this.selectedNotification = notification;
       this.showNotificationDetails = !this.showNotificationDetails;
     },
@@ -104,7 +100,7 @@ export default defineComponent({
         },
       });
 
-      const notifications: NotificationType[] = response.data ?? [];
+      const notifications: Notification[] = response.data ?? [];
 
       if(notifications.length > 0) {
         this.readNotifications = notifications.filter(
@@ -146,7 +142,8 @@ hr {
 }
 
 .scroll {
-  overflow-y: scroll;
-  height: 400px;
+  overflow-y: auto;
+  max-height: calc(100dvh - 140px);
+  padding-bottom: 80px;
 }
 </style>
