@@ -17,14 +17,19 @@
       </v-tabs>
       <v-tabs-window v-model="tab" class="px-3">
         <v-tabs-window-item value="list">
-          <user-card-generator 
-
-          />
+          <div v-if="loader.isLoading" class="d-flex justify-center py-6">
+            Carregando...
+          </div>
+          <p v-else-if="!users.length" class="text-center text-medium-emphasis py-6">
+            Nenhum usuário encontrado.
+          </p>
+          <UserCardGenerator v-else :users="users" />
         </v-tabs-window-item>
         <v-tabs-window-item value="create">
           <v-mask-input
             v-model="user.cpf"
             prepend-inner-icon="mdi-badge-account-horizontal-outline"
+            class="mt-4"
             label="CPF"
             mask="###.###.###-##"
           />
@@ -57,6 +62,7 @@
 import { useLoaderStore } from "~/stores/loader";
 import type UserRegister from "~~/shared/types/userRegister";
 import { type User } from "~~/shared/types/user";
+import type UserListResponse from "~~/shared/types/userListResponse";
 import { useAuthStore } from "~/stores/auth";
 
 export default defineComponent({
@@ -81,10 +87,29 @@ export default defineComponent({
       tab: ref(null),
     };
   },
-  mounted() {
-    
+  async mounted() {
+    await this.loadUsers();
   },
   methods: {
+    async loadUsers() {
+      const { $toast, $api } = useNuxtApp();
+      const token = useCookie("token");
+      this.loader.startLoading();
+      try {
+        const response = await $api("/admin/usuarios", {
+          headers: {
+            Authorization: `Bearer ${token.value}`, // adjust to how you store the JWT
+          },
+          query: { page_size: 100 },
+        });
+
+        this.users = response.data.results;
+      } catch (e) {
+        $toast.error("Não foi possível carregar os usuários.");
+      } finally {
+        this.loader.endLoading();
+      }
+    },
     async register() {
       this.loader.startLoading();
       const { $toast, $api } = useNuxtApp();

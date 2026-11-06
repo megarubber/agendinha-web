@@ -11,7 +11,6 @@
         <v-tab value="novo">Novo Agendamento</v-tab>
         <v-tab value="calendario">Calendário</v-tab>
       </v-tabs>
-
       <v-tabs-window v-model="tab" class="mt-4">
         <!-- NOVO AGENDAMENTO -->
         <v-tabs-window-item value="novo">
@@ -50,7 +49,6 @@
                   </template>
                 </v-autocomplete>
               </v-col>
-              
               <v-col cols="12" md="6">
                 <v-text-field
                   v-model="form.titulo"
@@ -59,7 +57,6 @@
                   :rules="[v => !!v || 'O título é obrigatório']"
                 />
               </v-col>
-
               <v-col cols="12" md="6">
                 <v-text-field
                   v-model="form.data"
@@ -69,7 +66,6 @@
                   :rules="[v => !!v || 'A data e hora são obrigatórias']"
                 />
               </v-col>
-
               <v-col cols="12" md="6">
                 <v-text-field
                   v-model="form.local"
@@ -78,15 +74,13 @@
                   :rules="[v => !!v || 'O local é obrigatório']"
                 />
               </v-col>
-              
               <v-col cols="12">
                 <v-text-field
                   v-model="form.medico"
                   prepend-inner-icon="mdi-stethoscope"
-                  label="Médico responsável"
+                  label="Responsável pelo atendimento"
                 />
               </v-col>
-
               <v-col cols="12">
                 <v-textarea
                   v-model="form.descricao"
@@ -100,7 +94,6 @@
                 />
               </v-col>
             </v-row>
-
             <v-btn
               class="w-100 mt-2"
               color="primary"
@@ -111,7 +104,6 @@
             </v-btn>
           </v-form>
         </v-tabs-window-item>
-
         <!-- CALENDÁRIO -->
         <v-tabs-window-item value="calendario">
           <div class="mx-auto" style="max-width: 1000px;">
@@ -145,7 +137,6 @@
                 </component>
               </ClientOnly>
             </section>
-            
             <div v-if="dayExams.length > 0" class="mt-4">
               <p class="mb-4 font-weight-bold">Compromissos marcados nesse dia</p>
               <section class="scroll">
@@ -159,7 +150,6 @@
         </v-tabs-window-item>
       </v-tabs-window>
     </div>
-
     <div v-if="showExamDetails && selectedExam">
       <AppointmentCard
         :id_agendamento="selectedExam.id_agendamento"
@@ -179,7 +169,6 @@
         @edit="handleEditAppointment"
       />
     </div>
-
     <!-- Delete Confirmation Dialog -->
     <v-dialog v-model="showDeleteDialog" max-width="400">
       <v-card class="rounded-xl pa-2">
@@ -432,7 +421,7 @@ const salvarAgendamento = async () => {
     }
 
     if (res.status === 200 || res.status === 201) {
-      toast.success(editingAppointmentId.value ? 'Agendamento atualizado!' : 'Agendamento criado com sucesso!');
+      toast.success(editingAppointmentId.value ? 'Agendamento atualizado!' : `Agendamento criado com sucesso!`);
       form.value = { paciente: null, titulo: '', descricao: '', data: '', local: '', medico: '' };
       nextTick(() => {
         formRef.value?.resetValidation();
