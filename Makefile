@@ -1,3 +1,3 @@
-graacc-web-startup:
+agendinha-web-startup:
 	npm install
 	npm run dev
